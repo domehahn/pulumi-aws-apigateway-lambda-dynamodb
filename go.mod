@@ -5,7 +5,6 @@ go 1.21
 toolchain go1.22.3
 
 require (
-	github.com/pulumi/pulumi-aws-apigateway/sdk/v2 v2.0.0
 	github.com/pulumi/pulumi-aws/sdk/v6 v6.5.0
 	github.com/pulumi/pulumi/sdk/v3 v3.96.1
 )
@@ -88,8 +87,9 @@ require (
 	golang.org/x/tools v0.14.0 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20230706204954-ccb25ca9f130 // indirect
 	google.golang.org/grpc v1.57.1 // indirect
-	google.golang.org/protobuf v1.31.0 // indirect
+	google.golang.org/protobuf v1.33.0 // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	lukechampine.com/frand v1.4.2 // indirect
+	pgregory.net/rapid v0.6.1 // indirect
 )
