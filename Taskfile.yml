@@ -1,0 +1,17 @@
+version: "3"
+
+tasks:
+  build:
+    desc: Build the app
+    cmds:
+      - go build
+
+  test:
+    desc: Run the tests
+    cmds:
+      - go test -v ./...
+
+  lint:
+    desc: Lint the code
+    cmds:
+      - golangci-lint run
