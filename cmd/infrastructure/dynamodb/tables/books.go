@@ -9,10 +9,6 @@ func CreateDynamoDBTableBook(ctx *pulumi.Context) (*dynamodb.Table, error) {
 	tableBook, err := dynamodb.NewTable(ctx, "Books", &dynamodb.TableArgs{
 		Attributes: dynamodb.TableAttributeArray{
 			&dynamodb.TableAttributeArgs{
-				Name: pulumi.String("id"),
-				Type: pulumi.String("S"),
-			},
-			&dynamodb.TableAttributeArgs{
 				Name: pulumi.String("author"),
 				Type: pulumi.String("S"),
 			},
@@ -33,7 +29,7 @@ func CreateDynamoDBTableBook(ctx *pulumi.Context) (*dynamodb.Table, error) {
 				Type: pulumi.String("N"),
 			},
 		},
-		HashKey: pulumi.String("id"),
+		HashKey: pulumi.String("isbn"),
 		GlobalSecondaryIndexes: dynamodb.TableGlobalSecondaryIndexArray{
 			// Define Global Secondary Indexes (GSIs) for other attributes that you want to be able to query against
 			// Example GSI (you can add as many as you need):
@@ -50,11 +46,6 @@ func CreateDynamoDBTableBook(ctx *pulumi.Context) (*dynamodb.Table, error) {
 			&dynamodb.TableGlobalSecondaryIndexArgs{
 				Name:           pulumi.String("PriceIndex"),
 				HashKey:        pulumi.String("price"),
-				ProjectionType: pulumi.String("ALL"),
-			},
-			&dynamodb.TableGlobalSecondaryIndexArgs{
-				Name:           pulumi.String("IsbnIndex"),
-				HashKey:        pulumi.String("isbn"),
 				ProjectionType: pulumi.String("ALL"),
 			},
 			&dynamodb.TableGlobalSecondaryIndexArgs{
