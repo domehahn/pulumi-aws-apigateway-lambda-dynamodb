@@ -39,13 +39,13 @@ func CreateRoute(ctx *pulumi.Context, name string, apigateway *apigatewayv2.Api,
 	return route, err
 }
 
-func Deploy(ctx *pulumi.Context, name string, apigateway *apigatewayv2.Api) (*apigatewayv2.Deployment, error) {
+func Deploy(ctx *pulumi.Context, name string, apigateway *apigatewayv2.Api, route []*apigatewayv2.Route) (*apigatewayv2.Deployment, error) {
 	deployment, err := apigatewayv2.NewDeployment(ctx, name, &apigatewayv2.DeploymentArgs{
 		ApiId: apigateway.ID(),
 		Triggers: pulumi.StringMap{
 			"redeployment": pulumi.String("RedeploymentTrigger"),
 		},
-	})
+	}, pulumi.DependsOn([]pulumi.Resource{route[0], route[1], route[2], route[3], route[4]}))
 	return deployment, err
 }
 

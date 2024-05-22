@@ -1,12 +1,14 @@
 import boto3
 import json
 import os
-from function import body
+import body
 
 def updateBook(event, context):
     dynamodb = boto3.client('dynamodb')
 
     b = body.getBody(event)
+
+    isbn = event['pathParameters'][0]
 
     if b:
         try:
@@ -33,7 +35,7 @@ def updateBook(event, context):
                 },
                 Key={
                     'isbn': {
-                        'S': b.get('isbn'),
+                        'S': isbn,
                     },
                 },
                 ReturnValues='ALL_NEW',
@@ -42,8 +44,12 @@ def updateBook(event, context):
             )
 
             return {
+                "headers": {
+                    "Content-Type": "application/json"
+                },
                 'statusCode': 200,
-                'body': json.dumps('Data successful updated.')
+                'message': 'Book updated',
+                'body': json.dumps(b)
             }
 
         except Exception as e:

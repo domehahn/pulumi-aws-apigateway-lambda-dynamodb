@@ -3,7 +3,7 @@ import os
 import json
 
 
-def getBooks(event, context):
+def getCartItems(event, context):
     dynamodb = boto3.resource('dynamodb')
     table = dynamodb.Table(os.environ['DYNAMODB_TABLE_NAME'])
     response = table.scan()
@@ -12,6 +12,6 @@ def getBooks(event, context):
             "Content-Type": "application/json"
         },
         'statusCode': 200,
-        'message': 'A list of books',
+        'message': 'A list of cart items',
         'body': json.dumps(response['Items'])
     }

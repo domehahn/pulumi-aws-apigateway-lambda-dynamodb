@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/pulumi/pulumi-aws/sdk/v6/go/aws/apigatewayv2"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 	apigateway2 "pulumi-00/cmd/infrastructure/apigateway"
 	"pulumi-00/cmd/infrastructure/cloudwatch"
@@ -74,7 +75,7 @@ func main() {
 			return err
 		}
 
-		_, err = lambda.CreateLamdbaFunction(ctx, "cartItems", "getcart.getCartItems", "./function/cart", lambdaRole, tableCartItem, cartItemAttachedPolicy)
+		getCartItemsFn, err := lambda.CreateLamdbaFunction(ctx, "cartItems", "getcartitems.getCartItems", "./function/cart", lambdaRole, tableCartItem, cartItemAttachedPolicy)
 		if err != nil {
 			return err
 		}
@@ -106,25 +107,50 @@ func main() {
 			return err
 		}
 
-		// Api Routes
-		_, err = apigateway2.CreateRoute(ctx, "getBooksRoute", apiGateway, "GET /books", getBooksIntegration)
-
-		_, err = apigateway2.CreateRoute(ctx, "createBookRoute", apiGateway, "PUT /createBook", createBookIntegration)
-
-		_, err = apigateway2.CreateRoute(ctx, "updateBookRoute", apiGateway, "PUT /updateBook", updateBookIntegration)
-
-		_, err = apigateway2.CreateRoute(ctx, "deleteBookRoute", apiGateway, "DELETE /deleteBook", deleteBookIntegration)
-
-		apiDeployment, err := apigateway2.Deploy(ctx, "apiDeployment", apiGateway)
+		getCartItemsIntegration, err := apigateway2.Integration(ctx, "getCartItemsIntegration", apiGateway, getCartItemsFn)
 		if err != nil {
 			return err
 		}
 
+		// Api Routes
+		booksRoute, err := apigateway2.CreateRoute(ctx, "getBooksRoute", apiGateway, "GET /books", getBooksIntegration)
+		if err != nil {
+			return err
+		}
+
+		createBookRoute, err := apigateway2.CreateRoute(ctx, "createBookRoute", apiGateway, "POST /books", createBookIntegration)
+		if err != nil {
+			return err
+		}
+
+		updateBookRoute, err := apigateway2.CreateRoute(ctx, "updateBookRoute", apiGateway, "PATCH /books/{isbn}", updateBookIntegration)
+		if err != nil {
+			return err
+		}
+
+		deleteBookRoute, err := apigateway2.CreateRoute(ctx, "deleteBookRoute", apiGateway, "DELETE /books/{isbn}", deleteBookIntegration)
+		if err != nil {
+			return err
+		}
+
+		getCartItemsRoute, err := apigateway2.CreateRoute(ctx, "getCartItemsRoute", apiGateway, "GET /cart", getCartItemsIntegration)
+		if err != nil {
+			return err
+		}
+
+		// Api Deployment
+		apiDeployment, err := apigateway2.Deploy(ctx, "apiDeployment", apiGateway, []*apigatewayv2.Route{booksRoute, createBookRoute, updateBookRoute, deleteBookRoute, getCartItemsRoute})
+		if err != nil {
+			return err
+		}
+
+		// Api LogGroup
 		logGroup, err := cloudwatch.CreateLogGroup(ctx, "apigatewayLogGroup")
 		if err != nil {
 			return err
 		}
 
+		// Api Stage
 		stage, err := apigateway2.Stage(ctx, "stage", apiDeployment, apiGateway, logGroup)
 		if err != nil {
 			return err

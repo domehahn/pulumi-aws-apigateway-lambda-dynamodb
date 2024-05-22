@@ -9,10 +9,6 @@ func CreateDynamoDBTableCartItem(ctx *pulumi.Context) (*dynamodb.Table, error) {
 	tableBook, err := dynamodb.NewTable(ctx, "CartItem", &dynamodb.TableArgs{
 		Attributes: dynamodb.TableAttributeArray{
 			&dynamodb.TableAttributeArgs{
-				Name: pulumi.String("id"),
-				Type: pulumi.String("S"),
-			},
-			&dynamodb.TableAttributeArgs{
 				Name: pulumi.String("isbn"),
 				Type: pulumi.String("S"),
 			},
@@ -21,7 +17,7 @@ func CreateDynamoDBTableCartItem(ctx *pulumi.Context) (*dynamodb.Table, error) {
 				Type: pulumi.String("N"),
 			},
 		},
-		HashKey: pulumi.String("id"),
+		HashKey: pulumi.String("isbn"),
 		GlobalSecondaryIndexes: dynamodb.TableGlobalSecondaryIndexArray{
 			// Define Global Secondary Indexes (GSIs) for other attributes that you want to be able to query against
 			// Example GSI (you can add as many as you need):

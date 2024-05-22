@@ -1,7 +1,7 @@
 import boto3
 import os
 import json
-from function import body
+import body
 
 def deleteBook(event, context):
     dynamodb = boto3.client('dynamodb')
@@ -19,8 +19,11 @@ def deleteBook(event, context):
                 TableName=os.environ['DYNAMODB_TABLE_NAME'],
             )
             return {
-                'statusCode': 200,
-                'body': json.dumps('Data successful deleted.')
+                "headers": {
+                    "Content-Type": "application/json"
+                },
+                'statusCode': 204,
+                'message': 'Book deleted'
             }
 
         except Exception as e:

@@ -1,7 +1,7 @@
 import json
 import os
 import boto3
-from function import body
+import body
 
 
 def createBook(event, context):
@@ -43,8 +43,12 @@ def createBook(event, context):
             )
 
             return {
-                'statusCode': 200,
-                'body': json.dumps('Data successful created.')
+                "headers": {
+                    "Content-Type": "application/json"
+                },
+                'statusCode': 201,
+                'message': 'Book created',
+                'body': json.dumps(b)
             }
 
         except Exception as e:
