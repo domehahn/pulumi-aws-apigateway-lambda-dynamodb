@@ -52,7 +52,7 @@ func Deploy(ctx *pulumi.Context, name string, apigateway *apigatewayv2.Api) (*ap
 func Stage(ctx *pulumi.Context, name string, apiDeployment *apigatewayv2.Deployment, apigateway *apigatewayv2.Api, logGroup *cloudwatch.LogGroup) (*apigatewayv2.Stage, error) {
 	stage, err := apigatewayv2.NewStage(ctx, name, &apigatewayv2.StageArgs{
 		ApiId:        apigateway.ID(),
-		Name:         pulumi.String("prod"),
+		Name:         pulumi.String("dev"),
 		DeploymentId: apiDeployment.ID(),
 		AccessLogSettings: &apigatewayv2.StageAccessLogSettingsArgs{
 			DestinationArn: logGroup.Arn,

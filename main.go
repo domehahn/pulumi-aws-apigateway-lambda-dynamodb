@@ -12,19 +12,8 @@ import (
 
 func main() {
 	pulumi.Run(func(ctx *pulumi.Context) error {
-		//Create infrastructure
+		// DynamoDb
 		tableBook, err := tables.CreateDynamoDBTableBook(ctx)
-		if err != nil {
-			return err
-		}
-
-		tableCartItem, err := tables.CreateDynamoDBTableCartItem(ctx)
-		if err != nil {
-			return err
-		}
-
-		//Create lambda  role
-		lambdaRole, err := iam2.CreateLambdaRole(ctx, "lambdaRole")
 		if err != nil {
 			return err
 		}
@@ -34,11 +23,23 @@ func main() {
 			return err
 		}
 
+		tableCartItem, err := tables.CreateDynamoDBTableCartItem(ctx)
+		if err != nil {
+			return err
+		}
+
 		tableCartItemPolicy, err := iam2.CreateDynamodbPolicy(ctx, "tableCartItemPolicy", tableCartItem)
 		if err != nil {
 			return err
 		}
 
+		// Lambdarole
+		lambdaRole, err := iam2.CreateLambdaRole(ctx, "lambdaRole")
+		if err != nil {
+			return err
+		}
+
+		// Attached Policies
 		bookAttachedPolicy, err := iam2.CreateAttachedPolicy(ctx, "bookAttachedPolicy", tableBookPolicy, lambdaRole)
 		if err != nil {
 			return err
@@ -49,38 +50,42 @@ func main() {
 			return err
 		}
 
+		// Lambdas
+
 		// ### User functions ###
-		getBooksFn, err := lambda.CreateLamdbaFunction(ctx, "getBooks", "lambda_book.getBooks", lambdaRole, tableBook, bookAttachedPolicy)
+		getBooksFn, err := lambda.CreateLamdbaFunction(ctx, "getBooks", "getbook.getBooks", "./function/book", lambdaRole, tableBook, bookAttachedPolicy)
 		if err != nil {
 			return err
 		}
 
 		// ### Admin functions ###
-		createBookFn, err := lambda.CreateLamdbaFunction(ctx, "createBook", "lambda_book.createBook", lambdaRole, tableBook, bookAttachedPolicy)
+		createBookFn, err := lambda.CreateLamdbaFunction(ctx, "createBook", "createbook.createBook", "./function/book", lambdaRole, tableBook, bookAttachedPolicy)
 		if err != nil {
 			return err
 		}
 
-		updateBookFn, err := lambda.CreateLamdbaFunction(ctx, "updateBook", "lambda_book.updateBook", lambdaRole, tableBook, bookAttachedPolicy)
+		updateBookFn, err := lambda.CreateLamdbaFunction(ctx, "updateBook", "updatebook.updateBook", "./function/book", lambdaRole, tableBook, bookAttachedPolicy)
 		if err != nil {
 			return err
 		}
 
-		deleteBookFn, err := lambda.CreateLamdbaFunction(ctx, "deleteBook", "lambda_book.deleteBook", lambdaRole, tableBook, bookAttachedPolicy)
+		deleteBookFn, err := lambda.CreateLamdbaFunction(ctx, "deleteBook", "deletebook.deleteBook", "./function/book", lambdaRole, tableBook, bookAttachedPolicy)
 		if err != nil {
 			return err
 		}
 
-		_, err = lambda.CreateLamdbaFunction(ctx, "cartItems", "lambda_cartItem.getCartItems", lambdaRole, tableCartItem, cartItemAttachedPolicy)
+		_, err = lambda.CreateLamdbaFunction(ctx, "cartItems", "getcart.getCartItems", "./function/cart", lambdaRole, tableCartItem, cartItemAttachedPolicy)
 		if err != nil {
 			return err
 		}
 
+		// Api Gateway
 		apiGateway, err := apigateway2.CreateApiGateway(ctx, "ApiGateway")
 		if err != nil {
 			return err
 		}
 
+		// Api Integrations
 		getBooksIntegration, err := apigateway2.Integration(ctx, "getBooksIntegration", apiGateway, getBooksFn)
 		if err != nil {
 			return err
@@ -101,6 +106,7 @@ func main() {
 			return err
 		}
 
+		// Api Routes
 		_, err = apigateway2.CreateRoute(ctx, "getBooksRoute", apiGateway, "GET /books", getBooksIntegration)
 
 		_, err = apigateway2.CreateRoute(ctx, "createBookRoute", apiGateway, "PUT /createBook", createBookIntegration)
