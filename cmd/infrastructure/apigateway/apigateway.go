@@ -21,7 +21,7 @@ func Integration(ctx *pulumi.Context, name string, apigateway *apigatewayv2.Api,
 	integration, err := apigatewayv2.NewIntegration(ctx, name, &apigatewayv2.IntegrationArgs{
 		ApiId:                apigateway.ID(),
 		IntegrationType:      pulumi.String("AWS_PROXY"),
-		IntegrationUri:       lambda.Arn,
+		IntegrationUri:       lambda.InvokeArn,
 		IntegrationMethod:    pulumi.String("POST"),
 		PayloadFormatVersion: pulumi.String("2.0"),
 	})
@@ -45,7 +45,7 @@ func Deploy(ctx *pulumi.Context, name string, apigateway *apigatewayv2.Api, rout
 		Triggers: pulumi.StringMap{
 			"redeployment": pulumi.String("RedeploymentTrigger"),
 		},
-	}, pulumi.DependsOn([]pulumi.Resource{route[0], route[1], route[2], route[3], route[4]}))
+	}, pulumi.DependsOn([]pulumi.Resource{route[0], route[1], route[2], route[3], route[4], route[5], route[6], route[7]}))
 	return deployment, err
 }
 

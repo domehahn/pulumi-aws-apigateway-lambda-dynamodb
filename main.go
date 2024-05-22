@@ -13,6 +13,7 @@ import (
 
 func main() {
 	pulumi.Run(func(ctx *pulumi.Context) error {
+		//############################
 		// DynamoDb
 		tableBook, err := tables.CreateDynamoDBTableBook(ctx)
 		if err != nil {
@@ -34,12 +35,14 @@ func main() {
 			return err
 		}
 
+		//############################
 		// Lambdarole
 		lambdaRole, err := iam2.CreateLambdaRole(ctx, "lambdaRole")
 		if err != nil {
 			return err
 		}
 
+		//############################
 		// Attached Policies
 		bookAttachedPolicy, err := iam2.CreateAttachedPolicy(ctx, "bookAttachedPolicy", tableBookPolicy, lambdaRole)
 		if err != nil {
@@ -51,10 +54,31 @@ func main() {
 			return err
 		}
 
+		//############################
 		// Lambdas
 
 		// ### User functions ###
-		getBooksFn, err := lambda.CreateLamdbaFunction(ctx, "getBooks", "getbook.getBooks", "./function/book", lambdaRole, tableBook, bookAttachedPolicy)
+		getBooksFn, err := lambda.CreateLamdbaFunction(ctx, "getBooks", "getbooks.getBooks", "./function/book", lambdaRole, tableBook, bookAttachedPolicy)
+		if err != nil {
+			return err
+		}
+
+		getBookFn, err := lambda.CreateLamdbaFunction(ctx, "getBook", "getbook.getBook", "./function/book", lambdaRole, tableBook, bookAttachedPolicy)
+		if err != nil {
+			return err
+		}
+
+		getCartItemsFn, err := lambda.CreateLamdbaFunction(ctx, "cartItems", "getcartitems.getCartItems", "./function/cartItem", lambdaRole, tableCartItem, cartItemAttachedPolicy)
+		if err != nil {
+			return err
+		}
+
+		addCartItemFn, err := lambda.CreateLamdbaFunction(ctx, "addCartItem", "addcartitem.addCartItem", "./function/cartItem", lambdaRole, tableCartItem, cartItemAttachedPolicy)
+		if err != nil {
+			return err
+		}
+
+		deleteCartItemFn, err := lambda.CreateLamdbaFunction(ctx, "deleteCartItem", "deletecartitem.deleteCartItem", "./function/cartItem", lambdaRole, tableCartItem, cartItemAttachedPolicy)
 		if err != nil {
 			return err
 		}
@@ -75,19 +99,21 @@ func main() {
 			return err
 		}
 
-		getCartItemsFn, err := lambda.CreateLamdbaFunction(ctx, "cartItems", "getcartitems.getCartItems", "./function/cart", lambdaRole, tableCartItem, cartItemAttachedPolicy)
-		if err != nil {
-			return err
-		}
-
+		//############################
 		// Api Gateway
 		apiGateway, err := apigateway2.CreateApiGateway(ctx, "ApiGateway")
 		if err != nil {
 			return err
 		}
 
+		//############################
 		// Api Integrations
 		getBooksIntegration, err := apigateway2.Integration(ctx, "getBooksIntegration", apiGateway, getBooksFn)
+		if err != nil {
+			return err
+		}
+
+		getBookIntegration, err := apigateway2.Integration(ctx, "getBookIntegration", apiGateway, getBookFn)
 		if err != nil {
 			return err
 		}
@@ -112,8 +138,24 @@ func main() {
 			return err
 		}
 
+		addCartItemIntegration, err := apigateway2.Integration(ctx, "addCartItemIntegration", apiGateway, addCartItemFn)
+		if err != nil {
+			return err
+		}
+
+		deleteCartItemIntegration, err := apigateway2.Integration(ctx, "deleteCartItemIntegration", apiGateway, deleteCartItemFn)
+		if err != nil {
+			return err
+		}
+
+		//############################
 		// Api Routes
 		booksRoute, err := apigateway2.CreateRoute(ctx, "getBooksRoute", apiGateway, "GET /books", getBooksIntegration)
+		if err != nil {
+			return err
+		}
+
+		bookRoute, err := apigateway2.CreateRoute(ctx, "getBookRoute", apiGateway, "GET /books/{isbn}", getBookIntegration)
 		if err != nil {
 			return err
 		}
@@ -138,18 +180,31 @@ func main() {
 			return err
 		}
 
-		// Api Deployment
-		apiDeployment, err := apigateway2.Deploy(ctx, "apiDeployment", apiGateway, []*apigatewayv2.Route{booksRoute, createBookRoute, updateBookRoute, deleteBookRoute, getCartItemsRoute})
+		addCartItemRoute, err := apigateway2.CreateRoute(ctx, "addCartItemRoute", apiGateway, "POST /cart", addCartItemIntegration)
 		if err != nil {
 			return err
 		}
 
+		deleteCartItemRoute, err := apigateway2.CreateRoute(ctx, "deleteCartItemRoute", apiGateway, "DELETE /cart/{isbn}", deleteCartItemIntegration)
+		if err != nil {
+			return err
+		}
+
+		//############################
+		// Api Deployment
+		apiDeployment, err := apigateway2.Deploy(ctx, "apiDeployment", apiGateway, []*apigatewayv2.Route{booksRoute, bookRoute, createBookRoute, updateBookRoute, deleteBookRoute, getCartItemsRoute, addCartItemRoute, deleteCartItemRoute})
+		if err != nil {
+			return err
+		}
+
+		//############################
 		// Api LogGroup
 		logGroup, err := cloudwatch.CreateLogGroup(ctx, "apigatewayLogGroup")
 		if err != nil {
 			return err
 		}
 
+		//############################
 		// Api Stage
 		stage, err := apigateway2.Stage(ctx, "stage", apiDeployment, apiGateway, logGroup)
 		if err != nil {

@@ -12,6 +12,6 @@ def getBooks(event, context):
             "Content-Type": "application/json"
         },
         'statusCode': 200,
-        'message': 'A list of books',
-        'body': json.dumps(response['Items'])
+        'message': 'A list of book',
+        'body': response['Items']
     }

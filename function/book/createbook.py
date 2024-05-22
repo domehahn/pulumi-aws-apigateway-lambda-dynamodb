@@ -7,16 +7,16 @@ import body
 def createBook(event, context):
     dynamodb = boto3.client('dynamodb')
 
-    b = body.getBody(event)
+    try:
+        b = body.getBody(event)
 
-    if b:
-        author = b.get('author')
-        title = b.get('title')
-        price = b.get('price')
-        isbn = b.get('isbn')
-        copiesInStock = b.get('copiesInStock')
+        if b:
+            author = b.get('author')
+            title = b.get('title')
+            price = b.get('price')
+            isbn = b.get('isbn')
+            copiesInStock = b.get('copiesInStock')
 
-        try:
             dynamodb.put_item(
                 Item={
                     'author': {
@@ -51,13 +51,8 @@ def createBook(event, context):
                 'body': json.dumps(b)
             }
 
-        except Exception as e:
-            return {
-                'statusCode': 500,
-                'body': json.dumps(f'Error creating item: {str(e)}')
-            }
-
-    return {
-        'statusCode': 400,
-        'body': json.dumps('Data creation failed.')
-    }
+    except Exception as e:
+        return {
+            'statusCode': 500,
+            'body': json.dumps(f'Error creating item: {str(e)}')
+        }

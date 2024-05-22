@@ -3,15 +3,16 @@ import json
 import os
 import body
 
+
 def updateBook(event, context):
     dynamodb = boto3.client('dynamodb')
 
-    b = body.getBody(event)
+    try:
+        b = body.getBody(event)
 
-    isbn = event['pathParameters'][0]
+        isbn = event['pathParameters']['isbn']
 
-    if b:
-        try:
+        if b:
             dynamodb.update_item(
                 ExpressionAttributeNames={
                     '#A': 'author',
@@ -52,13 +53,13 @@ def updateBook(event, context):
                 'body': json.dumps(b)
             }
 
-        except Exception as e:
-            return {
-                'statusCode': 500,
-                'body': json.dumps(f'Error updating item: {str(e)}')
-            }
+        return {
+            'statusCode': 400,
+            'body': json.dumps('Data update failed.')
+        }
 
-    return {
-        'statusCode': 400,
-        'body': json.dumps('Data update failed.')
-    }
+    except Exception as e:
+        return {
+            'statusCode': 500,
+            'body': json.dumps(f'Error updating item: {str(e)}')
+        }
