@@ -15,3 +15,19 @@ tasks:
     desc: Lint the code
     cmds:
       - golangci-lint run
+
+  pulumi-config:
+    dec: Configure pulumi cli
+    cmds:
+      - pulumi config set aws:region eu-central-1
+      - pulumi stack select tutorial-playground/pulumi-00/aws-apigateway-lambda-dynamodb
+
+  pulumi-up:
+    dec: Start pulumi aws deployment
+    cmds:
+      - pulumi up --yes
+
+  pulumi-destroy:
+    desc: Destroy pulumi aws deployment
+    cmds:
+      - pulumi destroy --yes
