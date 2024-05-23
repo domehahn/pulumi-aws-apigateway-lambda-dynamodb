@@ -6,7 +6,7 @@ import (
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 )
 
-func CreateDynamodbPolicy(ctx *pulumi.Context, name string, table *dynamodb.Table) (*iam.Policy, error) {
+func DynamoDbPolicy(ctx *pulumi.Context, name string, table *dynamodb.Table) (*iam.Policy, error) {
 	// Create an IAM Policy for Lambda that grants access to the DynamoDB table.
 	policy, err := iam.NewPolicy(ctx, name, &iam.PolicyArgs{
 		Description: pulumi.String("IAM policy for Lambda to access DynamoDB table"),

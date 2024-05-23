@@ -5,7 +5,7 @@ import (
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 )
 
-func CreateDynamoDBTableCartItem(ctx *pulumi.Context) (*dynamodb.Table, error) {
+func DynamoDbTableCartItem(ctx *pulumi.Context) (*dynamodb.Table, error) {
 	tableBook, err := dynamodb.NewTable(ctx, "CartItem", &dynamodb.TableArgs{
 		Attributes: dynamodb.TableAttributeArray{
 			&dynamodb.TableAttributeArgs{

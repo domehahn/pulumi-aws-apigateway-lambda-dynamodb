@@ -8,7 +8,7 @@ import (
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 )
 
-func CreateApiGateway(ctx *pulumi.Context, name string) (*apigatewayv2.Api, error) {
+func ApiGateway(ctx *pulumi.Context, name string) (*apigatewayv2.Api, error) {
 	gateway, err := apigatewayv2.NewApi(ctx, name, &apigatewayv2.ApiArgs{
 		Name:         pulumi.String(name),
 		Description:  pulumi.String("An API Gateway"),
@@ -28,7 +28,7 @@ func Integration(ctx *pulumi.Context, name string, apigateway *apigatewayv2.Api,
 	return integration, err
 }
 
-func CreateRoute(ctx *pulumi.Context, name string, apigateway *apigatewayv2.Api, routeKey string, integration *apigatewayv2.Integration) (*apigatewayv2.Route, error) {
+func Route(ctx *pulumi.Context, name string, apigateway *apigatewayv2.Api, routeKey string, integration *apigatewayv2.Integration) (*apigatewayv2.Route, error) {
 	route, err := apigatewayv2.NewRoute(ctx, name, &apigatewayv2.RouteArgs{
 		ApiId:    apigateway.ID(),
 		RouteKey: pulumi.String(fmt.Sprintf("%s", routeKey)),

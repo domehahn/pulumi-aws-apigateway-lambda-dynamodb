@@ -5,7 +5,7 @@ import (
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 )
 
-func CreateLambdaRole(ctx *pulumi.Context, name string) (*iam.Role, error) {
+func LambdaRole(ctx *pulumi.Context, name string) (*iam.Role, error) {
 	// IAM role for the Lambda function
 	lambdaRole, err := iam.NewRole(ctx, name, &iam.RoleArgs{
 		AssumeRolePolicy: pulumi.String(`{

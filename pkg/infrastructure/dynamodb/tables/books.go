@@ -5,7 +5,7 @@ import (
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 )
 
-func CreateDynamoDBTableBook(ctx *pulumi.Context) (*dynamodb.Table, error) {
+func DynamoDbTableBook(ctx *pulumi.Context) (*dynamodb.Table, error) {
 	tableBook, err := dynamodb.NewTable(ctx, "Books", &dynamodb.TableArgs{
 		Attributes: dynamodb.TableAttributeArray{
 			&dynamodb.TableAttributeArgs{
