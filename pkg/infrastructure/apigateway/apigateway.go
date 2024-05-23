@@ -56,7 +56,7 @@ func Stage(ctx *pulumi.Context, name string, apiDeployment *apigatewayv2.Deploym
 		DeploymentId: apiDeployment.ID(),
 		AccessLogSettings: &apigatewayv2.StageAccessLogSettingsArgs{
 			DestinationArn: logGroup.Arn,
-			Format:         pulumi.String(`{"requestId":"$context.requestId","ip":"$context.identity.sourceIp","caller":"$context.identity.caller","user":"$context.identity.user","requestTime":"$context.requestTime","httpMethod":"$context.httpMethod","resourcePath":"$context.resourcePath","status":"$context.status","protocol":"$context.protocol","responseLength":"$context.responseLength"}`),
+			Format:         pulumi.String(`{"requestId":"$context.requestId","ip":"$context.identity.sourceIp","caller":"$context.identity.caller","user":"$context.identity.user","requestTime":"$context.requestTime","httpMethod":"$context.httpMethod","resourcePath":"$context.resourcePath","status":"$context.status","protocol":"$context.protocol","responseLength":"$context.responseLength", "integrationErrorMessage":"$context.integrationErrorMessage"}`),
 		},
 		AutoDeploy: pulumi.Bool(true),
 	})
