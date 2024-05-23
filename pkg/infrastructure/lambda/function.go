@@ -28,7 +28,8 @@ func LambdaPermission(ctx *pulumi.Context, name string, lambdaFn *lambda.Functio
 		Action:    pulumi.String("lambda:InvokeFunction"),
 		Function:  lambdaFn.Name,
 		Principal: pulumi.String("apigateway.amazonaws.com"),
-		SourceArn: apigateway.ExecutionArn,
+		SourceArn: pulumi.Sprintf("%s/*/*", apigateway.ExecutionArn),
 	})
+	lambda.NewInvocation(ctx, name, &lambda.InvocationArgs{})
 	return permission, err
 }
