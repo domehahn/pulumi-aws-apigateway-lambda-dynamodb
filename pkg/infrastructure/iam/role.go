@@ -5,19 +5,19 @@ import (
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 )
 
-func LambdaRole(ctx *pulumi.Context, name string) (*iam.Role, error) {
+func Role(ctx *pulumi.Context, name string, serviceName string) (*iam.Role, error) {
 	// IAM role for the Lambda function
 	lambdaRole, err := iam.NewRole(ctx, name, &iam.RoleArgs{
-		AssumeRolePolicy: pulumi.String(`{
+		AssumeRolePolicy: pulumi.Sprintf(`{
 				"Version": "2012-10-17",
 				"Statement": [{
 					"Action": "sts:AssumeRole",
 					"Effect": "Allow",
 					"Principal": {
-						"Service": "lambda.amazonaws.com"
+						"Service": "%s"
 					}
 				}]
-			}`),
+			}`, serviceName),
 	})
 	return lambdaRole, err
 }

@@ -19,6 +19,7 @@ tasks:
   pulumi-config:
     dec: Configure pulumi cli
     cmds:
+      - pulumi config set aws:profile AWS-Training
       - pulumi config set aws:region eu-central-1
       - pulumi stack select tutorial-playground/pulumi-00/aws-apigateway-lambda-dynamodb
 

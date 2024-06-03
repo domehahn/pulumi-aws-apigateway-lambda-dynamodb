@@ -1,3 +1,3 @@
 config:
-  aws:profile: AdministratorAccess-891377027817
+  aws:profile: AWS-Training
   aws:region: eu-central-1

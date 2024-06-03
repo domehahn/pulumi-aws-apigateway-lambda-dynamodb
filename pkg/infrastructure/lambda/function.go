@@ -23,6 +23,16 @@ func LamdbaFunction(ctx *pulumi.Context, name string, function string, path stri
 	return fn, err
 }
 
+func LamdbaFunctionShort(ctx *pulumi.Context, name string, function string, path string, role *iam.Role) (*lambda.Function, error) {
+	fn, err := lambda.NewFunction(ctx, name, &lambda.FunctionArgs{
+		Runtime: pulumi.String("python3.9"),
+		Handler: pulumi.String(function),
+		Role:    role.Arn,
+		Code:    pulumi.NewFileArchive(path),
+	})
+	return fn, err
+}
+
 func LambdaPermission(ctx *pulumi.Context, name string, lambdaFn *lambda.Function, apigateway *apigatewayv2.Api) (*lambda.Permission, error) {
 	permission, err := lambda.NewPermission(ctx, name, &lambda.PermissionArgs{
 		Action:    pulumi.String("lambda:InvokeFunction"),
