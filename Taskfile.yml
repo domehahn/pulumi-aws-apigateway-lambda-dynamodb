@@ -16,6 +16,16 @@ tasks:
     cmds:
       - golangci-lint run
 
+  aws-configure-sso:
+    dec: Configure AWS cli with single sign on
+    cmd:
+      - aws configure sso
+
+  aws-configure:
+    dec: Configure AWS cli
+    cmd:
+      - aws configure
+
   pulumi-config:
     dec: Configure pulumi cli
     cmds:
