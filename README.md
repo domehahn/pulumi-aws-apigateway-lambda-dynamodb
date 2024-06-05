@@ -23,6 +23,7 @@ $ brew install go
 ```
 
 2. **Install AWS Cli**
+
 Pulumi makes use of your local AWS Configuration.
 ```bash
 $ brew install awscli
@@ -39,6 +40,7 @@ $ git clone https://github.com/domehahn/pulumi-aws-apigateway-lambda-dynamodb.gi
 ```
 
 3. **Configure AWS Cli**
+
 Pulumi needs the AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY form you local aws configuration. To configure it you have 
 to sign in to AWS.
 ```bash
@@ -71,6 +73,7 @@ $ brew install go-task
 ```
 
 1. **Configure AWS Cli**
+
 Inside the project directory run
 ```bash
 $ task aws-configure-sso 
