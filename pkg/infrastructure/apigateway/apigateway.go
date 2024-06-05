@@ -31,7 +31,7 @@ func Authorizer(ctx *pulumi.Context, name string, apigateway *apigatewayv2.Api, 
 			},
 			Issuer: pulumi.Sprintf("https://%s", userPool.Endpoint),
 		},
-	})
+	}, pulumi.DependsOn([]pulumi.Resource{userPool, userPoolClient}))
 	return apiAuthorizer, err
 }
 

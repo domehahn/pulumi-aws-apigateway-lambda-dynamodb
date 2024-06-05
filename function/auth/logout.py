@@ -1,17 +1,16 @@
 import json
-
+import header
 import boto3
 
 def logout(event, context):
     client = boto3.client('cognito-idp')
 
     try:
-        b = body.getBody(event)
+        auth = header.getAuthToken(event)
 
-        if b:
+        if auth:
             client.global_sign_out(
-                AccessToken=b.get('accessToken'),
-                ClientId=b.get('clientId')
+                AccessToken=auth.get_token()
             )
             return {
                 "headers": {
@@ -19,6 +18,7 @@ def logout(event, context):
                 },
                 'statusCode': 200,
                 'message': 'Logout successful',
+                'body': json.dumps('Logout was successful. User is logged out.')
             }
         return {
             'statusCode': 401,

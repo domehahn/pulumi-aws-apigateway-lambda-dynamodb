@@ -1,22 +1,23 @@
 import json
-import body
+import header
 import boto3
+import body
 
 def login(event, context):
     client = boto3.client('cognito-idp')
 
     try:
         b = body.getBody(event)
+        auth = header.getBasicAuthValues(event)
 
-        if b:
+        if auth and b:
             response = client.initiate_auth(
                 AuthFlow='USER_PASSWORD_AUTH',
                 AuthParameters={
-                    'USERNAME': b.get('username'),
-                    'PASSWORD': b.get('password')
+                    'USERNAME': auth.get_username(),
+                    'PASSWORD': auth.get_password()
                 },
-                ClientId=b.get('clientId'),
-                UserPoolId=b.get('userPoolId')
+                ClientId=b.get('clientId')
             )
 
             if response:
@@ -26,7 +27,7 @@ def login(event, context):
                     },
                     'statusCode': 200,
                     'message': 'Authentication successful',
-                    'body': json.dump(response)
+                    'body': json.dumps(response['AuthenticationResult'])
                 }
 
             return {

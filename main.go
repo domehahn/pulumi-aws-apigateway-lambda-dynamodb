@@ -5,6 +5,7 @@ import (
 	"github.com/pulumi/pulumi-aws/sdk/v6/go/aws/apigatewayv2"
 	"github.com/pulumi/pulumi-aws/sdk/v6/go/aws/lambda"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
+	"pulumi-00/pkg/environment"
 	errorhandler "pulumi-00/pkg/error"
 	apigateway2 "pulumi-00/pkg/infrastructure/apigateway"
 	"pulumi-00/pkg/infrastructure/cloudwatch"
@@ -185,6 +186,21 @@ func main() {
 		}
 
 		//############################
+		// Cognito User
+		username, err := environment.ViperGetEnvVariable("sensitive.user.username")
+		password, err := environment.ViperGetEnvVariable("sensitive.user.password")
+		email, err := environment.ViperGetEnvVariable("sensitive.user.email")
+		sensitiveUser := cognito.SensitiveUser{
+			Username: username,
+			Password: password,
+			Email:    email,
+		}
+		_, err = cognito.User(ctx, "User", sensitiveUser, userPool)
+		if err != nil {
+			return err
+		}
+
+		//############################
 		// Cognito Userpool
 		userPoolClient, err := cognito.UserPoolClient(ctx, "UserPoolClient", userPool)
 		if err != nil {
@@ -207,7 +223,10 @@ func main() {
 
 		//############################
 		// Api Gateway role Policies
-		_, err = iam2.AttachedPolicy(ctx, "apigatewayLogGroupRoleAttachment", gatewayRole, pulumi.String("arn:aws:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs").ToStringOutput())
+		_, err = iam2.AttachedPolicy(ctx,
+			"apigatewayLogGroupRoleAttachment",
+			gatewayRole,
+			pulumi.String("arn:aws:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs").ToStringOutput())
 
 		//############################
 		// Api Gateway
