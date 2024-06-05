@@ -33,13 +33,13 @@ After successful installation, you can find the configuration in you home direct
 $ ${HOME}/.aws
 ```
 
-2. **Clone GitHub Repository**
+3. **Clone GitHub Repository**
 ```bash
 $ mkdir pulumi-playground && cd pulumi-playground
 $ git clone https://github.com/domehahn/pulumi-aws-apigateway-lambda-dynamodb.git
 ```
 
-3. **Configure AWS Cli**
+4. **Configure AWS Cli**
 
 Pulumi needs the AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY form you local aws configuration. To configure it you have 
 to sign in to AWS.
@@ -47,7 +47,7 @@ to sign in to AWS.
 $ aws configure sso
 ```
 
-4. **Configure Pulumi Cli**
+5. **Configure Pulumi Cli**
 ```bash
 $ pulumi config set aws:profile AWS-Training
 $ pulumi config set aws:region eu-central-1
@@ -55,12 +55,12 @@ $ pulumi stack select tutorial-playground/pulumi-00/aws-apigateway-lambda-dynamo
 ```
 Replace `AWS-Training` with the name of your AWS Profile
 
-5. **Run Pulumi**
+6. **Run Pulumi**
 ```bash
 $ pulumi up
 ```
 
-6. **Stop Pulumi**
+7. **Stop Pulumi**
 ```bash
 $ pulumi destroy
 ```
