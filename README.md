@@ -91,7 +91,7 @@ $ task pulumi-up
 ```
 This runs with the parameter `--yes` which is a auto approval for provisioning the aws services.
 
-4**Stop Pulumi**
+4. **Stop Pulumi**
 ```bash
 $ task pulumi-destroy
 ```
