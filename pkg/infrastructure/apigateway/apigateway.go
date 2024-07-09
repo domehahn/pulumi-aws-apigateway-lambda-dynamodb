@@ -35,6 +35,21 @@ func Authorizer(ctx *pulumi.Context, name string, apigateway *apigatewayv2.Api, 
 	return apiAuthorizer, err
 }
 
+func LambdaAuthorizer(ctx *pulumi.Context, name string, apigateway *apigatewayv2.Api, lambda *lambda.Function) (*apigatewayv2.Authorizer, error) {
+	authorizer, err := apigatewayv2.NewAuthorizer(ctx, name, &apigatewayv2.AuthorizerArgs{
+		ApiId:          apigateway.ID(),
+		AuthorizerType: pulumi.String("REQUEST"),
+		Name:           pulumi.String(name),
+		AuthorizerUri:  lambda.InvokeArn,
+		IdentitySources: pulumi.StringArray{
+			pulumi.String("$request.header.Authorization"),
+		},
+		AuthorizerPayloadFormatVersion: pulumi.String("2.0"),
+		AuthorizerResultTtlInSeconds:   pulumi.Int(1),
+	})
+	return authorizer, err
+}
+
 func Integration(ctx *pulumi.Context, name string, apigateway *apigatewayv2.Api, lambda *lambda.Function) (*apigatewayv2.Integration, error) {
 	integration, err := apigatewayv2.NewIntegration(ctx, name, &apigatewayv2.IntegrationArgs{
 		ApiId:           apigateway.ID(),
@@ -44,15 +59,28 @@ func Integration(ctx *pulumi.Context, name string, apigateway *apigatewayv2.Api,
 	return integration, err
 }
 
-func Route(ctx *pulumi.Context, name string, apigateway *apigatewayv2.Api, routeKey string, integration *apigatewayv2.Integration, authorizer *apigatewayv2.Authorizer) (*apigatewayv2.Route, error) {
+func Route(ctx *pulumi.Context, name string, apiGateway *apigatewayv2.Api, routeKey string, integration *apigatewayv2.Integration, authorizer *apigatewayv2.Authorizer) (*apigatewayv2.Route, error) {
 	route, err := apigatewayv2.NewRoute(ctx, name, &apigatewayv2.RouteArgs{
-		ApiId:    apigateway.ID(),
+		ApiId:    apiGateway.ID(),
 		RouteKey: pulumi.String(fmt.Sprintf("%s", routeKey)),
 		Target: integration.ID().ApplyT(func(id pulumi.ID) (string, error) {
 			return fmt.Sprintf("integrations/%s", id), nil
 		}).(pulumi.StringOutput),
 		AuthorizationType: pulumi.String("JWT"),
 		AuthorizerId:      authorizer.ID(),
+	})
+	return route, err
+}
+
+func RouteTest(ctx *pulumi.Context, name string, apiGateway *apigatewayv2.Api, routeKey string, integration *apigatewayv2.Integration, authorizer *apigatewayv2.Authorizer) (*apigatewayv2.Route, error) {
+	route, err := apigatewayv2.NewRoute(ctx, name, &apigatewayv2.RouteArgs{
+		ApiId:             apiGateway.ID(),
+		RouteKey:          pulumi.String(fmt.Sprintf("%s", routeKey)),
+		AuthorizationType: pulumi.String("CUSTOM"),
+		AuthorizerId:      authorizer.ID(),
+		Target: integration.ID().ApplyT(func(id pulumi.ID) (string, error) {
+			return fmt.Sprintf("integrations/%s", id), nil
+		}).(pulumi.StringOutput),
 	})
 	return route, err
 }

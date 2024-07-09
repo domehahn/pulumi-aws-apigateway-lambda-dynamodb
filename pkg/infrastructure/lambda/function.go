@@ -8,18 +8,22 @@ import (
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 )
 
-func LamdbaFunction(ctx *pulumi.Context, name string, function string, path string, role *iam.Role, table *dynamodb.Table, attachPolicy *iam.RolePolicyAttachment) (*lambda.Function, error) {
+func LamdbaFunction(ctx *pulumi.Context, name string, function string, path string, role *iam.Role, table *dynamodb.Table, environmentVariables pulumi.StringMap, attachPolicies []*iam.RolePolicyAttachment) (*lambda.Function, error) {
 	fn, err := lambda.NewFunction(ctx, name, &lambda.FunctionArgs{
 		Runtime: pulumi.String("python3.9"),
 		Handler: pulumi.String(function),
 		Role:    role.Arn,
 		Code:    pulumi.NewFileArchive(path),
 		Environment: &lambda.FunctionEnvironmentArgs{
-			Variables: pulumi.StringMap{
-				"DYNAMODB_TABLE_NAME": table.Name,
-			},
+			Variables: environmentVariables,
 		},
-	}, pulumi.DependsOn([]pulumi.Resource{attachPolicy}))
+	}, pulumi.DependsOn(func() []pulumi.Resource {
+		deps := make([]pulumi.Resource, len(attachPolicies))
+		for i, policy := range attachPolicies {
+			deps[i] = policy
+		}
+		return deps
+	}()))
 	return fn, err
 }
 

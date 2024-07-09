@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/pulumi/pulumi-aws/sdk/v6/go/aws/apigatewayv2"
+	"github.com/pulumi/pulumi-aws/sdk/v6/go/aws/iam"
 	"github.com/pulumi/pulumi-aws/sdk/v6/go/aws/lambda"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 	"pulumi-00/pkg/environment"
@@ -45,6 +46,16 @@ func main() {
 			return err
 		}
 
+		tableTokenInvalidate, err := tables.DynamoDbTableTokenInvalidate(ctx)
+		if err != nil {
+			return err
+		}
+
+		tableTokenInvalidatePolicy, err := iam2.DynamoDbPolicy(ctx, "tableTokenInvalidate", tableTokenInvalidate)
+		if err != nil {
+			return err
+		}
+
 		//############################
 		// Lambda role
 		lambdaRole, err := iam2.Role(ctx, "lambdaRole", "lambda.amazonaws.com")
@@ -64,6 +75,11 @@ func main() {
 			return err
 		}
 
+		tokenInvalidateAttachedPolicy, err := iam2.AttachedPolicy(ctx, "tokenInvalidateLambdaDynamoDbRoleAttachment", lambdaRole, tableTokenInvalidatePolicy.Arn)
+		if err != nil {
+			return err
+		}
+
 		_, err = iam2.AttachedPolicy(ctx, "lambdaLogGroupRoleAttachment", lambdaRole, pulumi.String("arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole").ToStringOutput())
 		if err != nil {
 			return err
@@ -73,6 +89,18 @@ func main() {
 		// Lambdas
 
 		// ### User functions ###
+		cartItemTableEnv := pulumi.StringMap{
+			"DYNAMODB_TABLE_NAME": tableCartItem.Name,
+		}
+
+		bookTableEnv := pulumi.StringMap{
+			"DYNAMODB_TABLE_NAME": tableBook.Name,
+		}
+
+		tokenInvalidateTableEnv := pulumi.StringMap{
+			"DYNAMODB_TABLE_NAME": tableTokenInvalidate.Name,
+		}
+
 		getBooksFn, err := lambdaFn.LamdbaFunction(
 			ctx,
 			"getBooks",
@@ -80,15 +108,16 @@ func main() {
 			"./function/book",
 			lambdaRole,
 			tableBook,
-			bookAttachedPolicy)
+			bookTableEnv,
+			[]*iam.RolePolicyAttachment{bookAttachedPolicy, tokenInvalidateAttachedPolicy})
 
 		getBookFn, err := lambdaFn.LamdbaFunction(
 			ctx,
 			"getBook",
 			"getbook.getBook",
 			"./function/book",
-			lambdaRole, tableBook,
-			bookAttachedPolicy)
+			lambdaRole, tableBook, bookTableEnv,
+			[]*iam.RolePolicyAttachment{bookAttachedPolicy})
 
 		getCartItemsFn, err := lambdaFn.LamdbaFunction(
 			ctx,
@@ -96,17 +125,21 @@ func main() {
 			"getcartitems.getCartItems",
 			"./function/cartItem",
 			lambdaRole,
-			tableCartItem,
-			cartItemAttachedPolicy)
+			tableCartItem, cartItemTableEnv,
+			[]*iam.RolePolicyAttachment{cartItemAttachedPolicy})
 
+		multiTableEnv := pulumi.StringMap{
+			"DYNAMODB_TABLE_NAME": tableCartItem.Name,
+			"UPDATE_TABLE_NAME":   tableBook.Name,
+		}
 		addCartItemFn, err := lambdaFn.LamdbaFunction(
 			ctx,
 			"addCartItem",
 			"addcartitem.addCartItem",
 			"./function/cartItem",
 			lambdaRole,
-			tableCartItem,
-			cartItemAttachedPolicy)
+			tableCartItem, multiTableEnv,
+			[]*iam.RolePolicyAttachment{cartItemAttachedPolicy, bookAttachedPolicy})
 
 		deleteCartItemFn, err := lambdaFn.LamdbaFunction(
 			ctx,
@@ -114,8 +147,8 @@ func main() {
 			"deletecartitem.deleteCartItem",
 			"./function/cartItem",
 			lambdaRole,
-			tableCartItem,
-			cartItemAttachedPolicy)
+			tableCartItem, multiTableEnv,
+			[]*iam.RolePolicyAttachment{cartItemAttachedPolicy, bookAttachedPolicy})
 
 		// ### Admin functions ###
 		createBookFn, err := lambdaFn.LamdbaFunction(
@@ -124,8 +157,8 @@ func main() {
 			"createbook.createBook",
 			"./function/book",
 			lambdaRole,
-			tableBook,
-			bookAttachedPolicy)
+			tableBook, bookTableEnv,
+			[]*iam.RolePolicyAttachment{bookAttachedPolicy})
 
 		updateBookFn, err := lambdaFn.LamdbaFunction(
 			ctx,
@@ -133,32 +166,52 @@ func main() {
 			"updatebook.updateBook",
 			"./function/book",
 			lambdaRole,
-			tableBook,
-			bookAttachedPolicy)
+			tableBook, bookTableEnv,
+			[]*iam.RolePolicyAttachment{bookAttachedPolicy})
 
+		multiTableEnv = pulumi.StringMap{
+			"DYNAMODB_TABLE_NAME": tableBook.Name,
+			"UPDATE_TABLE_NAME":   tableCartItem.Name,
+		}
 		deleteBookFn, err := lambdaFn.LamdbaFunction(
 			ctx,
 			"deleteBook",
 			"deletebook.deleteBook",
 			"./function/book",
 			lambdaRole,
-			tableBook,
-			bookAttachedPolicy)
+			tableBook, multiTableEnv,
+			[]*iam.RolePolicyAttachment{bookAttachedPolicy})
 
 		// ### Authorization and Authentication functions ###
-		loginFn, err := lambdaFn.LamdbaFunctionShort(
+		loginFn, err := lambdaFn.LamdbaFunction(
 			ctx,
 			"login",
 			"login.login",
 			"./function/auth",
-			lambdaRole)
+			lambdaRole,
+			tableTokenInvalidate,
+			tokenInvalidateTableEnv,
+			[]*iam.RolePolicyAttachment{tokenInvalidateAttachedPolicy})
 
-		logoutFn, err := lambdaFn.LamdbaFunctionShort(
+		logoutFn, err := lambdaFn.LamdbaFunction(
 			ctx,
 			"logout",
 			"logout.logout",
 			"./function/auth",
-			lambdaRole)
+			lambdaRole,
+			tableTokenInvalidate,
+			tokenInvalidateTableEnv,
+			[]*iam.RolePolicyAttachment{tokenInvalidateAttachedPolicy})
+
+		authorizeFn, err := lambdaFn.LamdbaFunction(
+			ctx,
+			"authorize",
+			"authorize.authorize",
+			"./function/auth",
+			lambdaRole,
+			tableTokenInvalidate,
+			tokenInvalidateTableEnv,
+			[]*iam.RolePolicyAttachment{tokenInvalidateAttachedPolicy})
 
 		if err != nil {
 			errorhandler.HandlingError("Error creating lambda.")
@@ -257,9 +310,16 @@ func main() {
 
 		_, err = lambdaFn.LambdaPermission(ctx, "logoutPermission", logoutFn, apiGateway)
 
+		_, err = lambdaFn.LambdaPermission(ctx, "authorizePermission", authorizeFn, apiGateway)
+
 		//############################
 		// Api Authorizer
 		authorizer, err := apigateway2.Authorizer(ctx, "Authorizer", apiGateway, userPool, userPoolClient)
+		if err != nil {
+			errorhandler.HandlingError("Error creating authorizer.")
+		}
+
+		lambdaAuthorizer, err := apigateway2.LambdaAuthorizer(ctx, "AuthorizerTest", apiGateway, authorizeFn)
 		if err != nil {
 			errorhandler.HandlingError("Error creating authorizer.")
 		}
@@ -285,13 +345,23 @@ func main() {
 		loginIntegration, err := apigateway2.Integration(ctx, "loginIntegration", apiGateway, loginFn)
 
 		logoutIntegration, err := apigateway2.Integration(ctx, "logoutIntegration", apiGateway, logoutFn)
+
 		if err != nil {
 			errorhandler.HandlingError("Error creating integration.")
 		}
 
 		bookRoute, err := apigateway2.Route(ctx, "bookRoute", apiGateway, "GET /books/{isbn}", bookIntegration, authorizer)
 
-		booksRoute, err := apigateway2.Route(ctx, "booksRoute", apiGateway, "GET /books", booksIntegration, authorizer)
+		//booksRoute, err := apigateway2.Route(ctx, "booksRoute", apiGateway, "GET /books", booksIntegration, authorizer)
+
+		booksRoute, err := apigateway2.RouteTest(ctx, "booksRoute", apiGateway, "GET /books", booksIntegration, lambdaAuthorizer)
+
+		_, err = lambda.NewPermission(ctx, "invokePermission", &lambda.PermissionArgs{
+			Action:    pulumi.String("lambda:InvokeFunction"),
+			Function:  authorizeFn.Arn,
+			Principal: pulumi.String("lambda.amazonaws.com"),
+			SourceArn: getBooksFn.Arn,
+		})
 
 		createBookRoute, err := apigateway2.Route(ctx, "createBookRoute", apiGateway, "POST /books", createBookIntegration, authorizer)
 
@@ -331,13 +401,13 @@ func main() {
 
 		//############################
 		// Api Stage
-		stage, err := apigateway2.Stage(ctx, "stage", apiDeployment, apiGateway, logGroup)
+		_, err = apigateway2.Stage(ctx, "stage", apiDeployment, apiGateway, logGroup)
 		if err != nil {
 			errorhandler.HandlingError("Error creating stage.")
 		}
 
 		fullApiUrl := apiGateway.ApiEndpoint.ApplyT(func(endpoint string) string {
-			return fmt.Sprintf("%s/%s", endpoint, stage.Name)
+			return fmt.Sprintf("%s", endpoint)
 		}).(pulumi.StringOutput)
 
 		// The URL at which the REST API will be served

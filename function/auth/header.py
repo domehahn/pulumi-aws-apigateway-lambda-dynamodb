@@ -2,6 +2,8 @@ import base64
 import json
 import logging
 
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
 
 class BasicAuth:
     def __init__(self, username, password):
@@ -15,19 +17,6 @@ class BasicAuth:
     # Getter method for password
     def get_password(self):
         return self.__password
-
-
-class Token:
-    def __init__(self, token):
-        self.__token = token
-
-    # Getter method for token
-    def get_token(self):
-        return self.__token
-
-
-logger = logging.getLogger("boto3")
-logger.setLevel(logging.INFO)
 
 
 def getBasicAuthValues(event):
@@ -61,5 +50,4 @@ def getAuthToken(event):
     if auth_header:
         # Extract the token part after 'Bearer '
         bearer_token = auth_header[len('Bearer '):]
-        auth = Token(bearer_token)
-        return auth
+        return bearer_token

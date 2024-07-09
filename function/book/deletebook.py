@@ -1,8 +1,6 @@
 import boto3
 import os
 import json
-import body
-
 
 def deleteBook(event, context):
     dynamodb = boto3.client('dynamodb')
@@ -10,20 +8,38 @@ def deleteBook(event, context):
     try:
         isbn = event['pathParameters']['isbn']
 
-        dynamodb.delete_item(
-            Key={
-                'isbn': {
-                    'S': isbn,
+        # Perform transactional write to delete items from both tables
+        dynamodb.transact_write_items(
+            TransactItems=[
+                {
+                    'Delete': {
+                        'Key': {
+                            'isbn': {
+                                'S': isbn,
+                            },
+                        },
+                        'TableName': os.environ['DYNAMODB_TABLE_NAME']
+                    }
                 },
-            },
-            TableName=os.environ['DYNAMODB_TABLE_NAME'],
+                {
+                    'Delete': {
+                        'Key': {
+                            'isbn': {
+                                'S': isbn,
+                            },
+                        },
+                        'TableName': os.environ['UPDATE_TABLE_NAME']
+                    }
+                }
+            ]
         )
+
         return {
             "headers": {
                 "Content-Type": "application/json"
             },
             'statusCode': 204,
-            'message': 'Book deleted'
+            'body': json.dumps('Book deleted')
         }
 
     except Exception as e:

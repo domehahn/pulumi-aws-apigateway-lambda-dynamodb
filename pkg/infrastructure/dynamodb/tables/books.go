@@ -34,6 +34,11 @@ func DynamoDbTableBook(ctx *pulumi.Context) (*dynamodb.Table, error) {
 			// Define Global Secondary Indexes (GSIs) for other attributes that you want to be able to query against
 			// Example GSI (you can add as many as you need):
 			&dynamodb.TableGlobalSecondaryIndexArgs{
+				Name:           pulumi.String("IsbnIndex"),
+				HashKey:        pulumi.String("isbn"),
+				ProjectionType: pulumi.String("ALL"),
+			},
+			&dynamodb.TableGlobalSecondaryIndexArgs{
 				Name:           pulumi.String("AuthorIndex"),
 				HashKey:        pulumi.String("author"),
 				ProjectionType: pulumi.String("ALL"),

@@ -18,12 +18,12 @@ tasks:
 
   aws-configure-sso:
     dec: Configure AWS cli with single sign on
-    cmd:
+    cmds:
       - aws configure sso
 
   aws-configure:
     dec: Configure AWS cli
-    cmd:
+    cmds:
       - aws configure
 
   pulumi-config:
@@ -31,7 +31,7 @@ tasks:
     cmds:
       - pulumi config set aws:profile AWS-Training
       - pulumi config set aws:region eu-central-1
-      - pulumi stack select tutorial-playground/pulumi-00/aws-apigateway-lambda-dynamodb
+      - pulumi stack select domehahn/aws-apigateway-lambda-dynamodb
 
   pulumi-up:
     dec: Start pulumi aws deployment
