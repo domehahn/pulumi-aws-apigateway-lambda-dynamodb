@@ -52,9 +52,10 @@ func LambdaAuthorizer(ctx *pulumi.Context, name string, apigateway *apigatewayv2
 
 func Integration(ctx *pulumi.Context, name string, apigateway *apigatewayv2.Api, lambda *lambda.Function) (*apigatewayv2.Integration, error) {
 	integration, err := apigatewayv2.NewIntegration(ctx, name, &apigatewayv2.IntegrationArgs{
-		ApiId:           apigateway.ID(),
-		IntegrationType: pulumi.String("AWS_PROXY"),
-		IntegrationUri:  lambda.InvokeArn,
+		ApiId:                apigateway.ID(),
+		IntegrationType:      pulumi.String("AWS_PROXY"),
+		IntegrationUri:       lambda.InvokeArn,
+		PayloadFormatVersion: pulumi.String("2.0"),
 	})
 	return integration, err
 }
@@ -72,7 +73,7 @@ func Route(ctx *pulumi.Context, name string, apiGateway *apigatewayv2.Api, route
 	return route, err
 }
 
-func RouteTest(ctx *pulumi.Context, name string, apiGateway *apigatewayv2.Api, routeKey string, integration *apigatewayv2.Integration, authorizer *apigatewayv2.Authorizer) (*apigatewayv2.Route, error) {
+func LambdaAuthorizerRoute(ctx *pulumi.Context, name string, apiGateway *apigatewayv2.Api, routeKey string, integration *apigatewayv2.Integration, authorizer *apigatewayv2.Authorizer) (*apigatewayv2.Route, error) {
 	route, err := apigatewayv2.NewRoute(ctx, name, &apigatewayv2.RouteArgs{
 		ApiId:             apiGateway.ID(),
 		RouteKey:          pulumi.String(fmt.Sprintf("%s", routeKey)),

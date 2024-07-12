@@ -31,7 +31,7 @@ tasks:
     cmds:
       - pulumi config set aws:profile AWS-Training
       - pulumi config set aws:region eu-central-1
-      - pulumi stack select domehahn/aws-apigateway-lambda-dynamodb
+      - pulumi stack select domehahn/pulumi-00/aws-apigateway-lambda-dynamodb
 
   pulumi-up:
     dec: Start pulumi aws deployment
@@ -42,3 +42,8 @@ tasks:
     desc: Destroy pulumi aws deployment
     cmds:
       - pulumi destroy --yes
+
+  pulumi-refresh:
+    desc: Refresh pulumi config
+    cmds:
+      - ./refresh_pulumi.sh

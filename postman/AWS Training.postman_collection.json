@@ -9,15 +9,24 @@
 		{
 			"name": "GetBook",
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{access_token}}",
+							"type": "string"
+						}
+					]
+				},
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{aws_url}}/dev/books/978-3404175048",
+					"raw": "{{aws_url}}/books/978-3404175048",
 					"host": [
 						"{{aws_url}}"
 					],
 					"path": [
-						"dev",
 						"books",
 						"978-3404175048"
 					]
@@ -33,7 +42,7 @@
 					"bearer": [
 						{
 							"key": "token",
-							"value": "eyJraWQiOiJNcUltY2FOeWNQM2ZINGx6UXl0bzlUOGZPRjZZOUQ0a1VqUkhZQ2kwNjJjPSIsImFsZyI6IlJTMjU2In0.eyJzdWIiOiI0MzU0Mzg1Mi03MGIxLTcwYmItZWM4Ny04NWZiYTgxZjA5OWYiLCJpc3MiOiJodHRwczpcL1wvY29nbml0by1pZHAuZXUtY2VudHJhbC0xLmFtYXpvbmF3cy5jb21cL2V1LWNlbnRyYWwtMV9iZXdxWVdLaXIiLCJjbGllbnRfaWQiOiI0aG52ODhzMjVmNjh1MGoyc25qY3Uwc2QwNCIsIm9yaWdpbl9qdGkiOiI2YmExZjI4OC0xMmU3LTQxOGQtYTE3NS1mZWZjZDc5MzdhMTMiLCJldmVudF9pZCI6ImNhZTU4NWVlLTRhZDAtNDY2ZS05ZGFlLTg5ZDE0YmE1OWY0ZSIsInRva2VuX3VzZSI6ImFjY2VzcyIsInNjb3BlIjoiYXdzLmNvZ25pdG8uc2lnbmluLnVzZXIuYWRtaW4iLCJhdXRoX3RpbWUiOjE3MTc1ODQzNTIsImV4cCI6MTcxNzU4Nzk1MiwiaWF0IjoxNzE3NTg0MzUyLCJqdGkiOiIzZmQyNTU5YS1mZTQ1LTRkZWYtODk0My1kZWRiNWVhMTAxYWUiLCJ1c2VybmFtZSI6Ikxlcm5ncnVwcGUyIn0.BQE0_dJ3JrFCguLQJCm8ZIoe_SzXN4ENO41-o7yl8A-RdZTJJXGxw2n0AkmVTEcw1LAmLXu3R7FKgwh8zMzZKQBF9JvVKCzGPZONu2Ej6RUtNoPLse2oIJziXSGg4c4BgBQ_YO42-Gc_blYYAXiZIpClshU3INzmjHB7vCIAjzpfYY4IHsCTtGmZjZt5HemaZOinJKxMYrtQat46Jy0tom6gLpOrplPgd-kpZa521yRKdDxlOrzOvhE7yAHlatnOoy0ez83w0Wowclc-RWFQdR8eCrCv0cRntazbVdfhdvP2BDGmjHFEv9gS8nIQld3cfoyjOxWEnsqAV2uCOqIgog",
+							"value": "{{access_token}}",
 							"type": "string"
 						}
 					]
@@ -56,36 +65,11 @@
 			"name": "CreateBook",
 			"request": {
 				"auth": {
-					"type": "awsv4",
-					"awsv4": [
+					"type": "bearer",
+					"bearer": [
 						{
-							"key": "sessionToken",
-							"value": "",
-							"type": "string"
-						},
-						{
-							"key": "addAuthDataToQuery",
-							"value": false,
-							"type": "boolean"
-						},
-						{
-							"key": "service",
-							"value": "execute-api",
-							"type": "string"
-						},
-						{
-							"key": "region",
-							"value": "{{aws_region}}",
-							"type": "string"
-						},
-						{
-							"key": "secretKey",
-							"value": "{{secret_key}}",
-							"type": "string"
-						},
-						{
-							"key": "accessKey",
-							"value": "{{access_key}}",
+							"key": "token",
+							"value": "{{access_token}}",
 							"type": "string"
 						}
 					]
@@ -123,9 +107,9 @@
 					"raw": "{\n  \"author\": \"Dan Brown\",\n  \"title\": \"Sakrileg\",\n  \"price\": \"14.00\",\n  \"isbn\": \"978-3404175048\",\n  \"copiesInStock\": \"900\"\n}"
 				},
 				"url": {
-					"raw": "{{aws_url}}/dev/books/978-3404175048",
+					"raw": "{{awsurl}}/dev/books/978-3404175048",
 					"host": [
-						"{{aws_url}}"
+						"{{awsurl}}"
 					],
 					"path": [
 						"dev",
@@ -139,15 +123,24 @@
 		{
 			"name": "DeleteBook",
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{access_token}}",
+							"type": "string"
+						}
+					]
+				},
 				"method": "DELETE",
 				"header": [],
 				"url": {
-					"raw": "{{aws_url}}/dev/books/978-3404175048",
+					"raw": "{{aws_url}}/books/978-3404175048",
 					"host": [
 						"{{aws_url}}"
 					],
 					"path": [
-						"dev",
 						"books",
 						"978-3404175048"
 					]
@@ -158,15 +151,24 @@
 		{
 			"name": "GetCartItems",
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{access_token}}",
+							"type": "string"
+						}
+					]
+				},
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{aws_url}}/dev/cart",
+					"raw": "{{aws_url}}/cart",
 					"host": [
 						"{{aws_url}}"
 					],
 					"path": [
-						"dev",
 						"cart"
 					]
 				}
@@ -176,19 +178,28 @@
 		{
 			"name": "AddCartItem",
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{access_token}}",
+							"type": "string"
+						}
+					]
+				},
 				"method": "POST",
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"isbn\" : \"978-3404175048\",\n    \"quantity\" : \"3\"\n}"
+					"raw": "{\n    \"isbn\" : \"978-3404175048\",\n    \"quantity\" : \"24\"\n}"
 				},
 				"url": {
-					"raw": "{{aws_url}}/dev/cart",
+					"raw": "{{aws_url}}/cart",
 					"host": [
 						"{{aws_url}}"
 					],
 					"path": [
-						"dev",
 						"cart"
 					]
 				}
@@ -197,6 +208,75 @@
 		},
 		{
 			"name": "Login",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response status code is 200\", function () {",
+							"  var jsonData = pm.response.json();",
+							"    ",
+							"    // Extract the AccessToken from the response",
+							"    var accessToken = jsonData.AccessToken;",
+							"    ",
+							"    // Set the environment variable 'access_token' to the value of 'AccessToken'",
+							"    pm.environment.set(\"access_token\", accessToken);",
+							"    ",
+							"    // Log the access token for debugging purposes (optional)",
+							"    console.log(\"Access token set to environment variable: \" + accessToken);",
+							"});",
+							"",
+							"pm.test(\"Response Content-Type header is set to application/json\", function () {",
+							"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+							"});",
+							"",
+							"",
+							"pm.test(\"AccessToken is a non-empty string\", function () {",
+							"    const responseData = pm.response.json();",
+							"    ",
+							"    pm.expect(responseData.AccessToken).to.be.a('string').and.to.have.lengthOf.at.least(1, \"AccessToken should not be empty\");",
+							"});",
+							"",
+							"",
+							"pm.test(\"ExpiresIn is a non-negative integer\", function () {",
+							"    const responseData = pm.response.json();",
+							"",
+							"    pm.expect(responseData.ExpiresIn).to.be.a('number');",
+							"    pm.expect(responseData.ExpiresIn).to.be.at.least(0, \"ExpiresIn should be a non-negative integer\");",
+							"});",
+							"",
+							"",
+							"pm.test(\"TokenType is a non-empty string\", function () {",
+							"    const responseData = pm.response.json();",
+							"    ",
+							"    pm.expect(responseData).to.be.an('object');",
+							"    pm.expect(responseData.TokenType).to.be.a('string').and.to.have.lengthOf.at.least(1, \"Value should not be empty\");",
+							"});",
+							"",
+							"",
+							"pm.test(\"RefreshToken is a non-empty string\", function () {",
+							"    const responseData = pm.response.json();",
+							"    ",
+							"    pm.expect(responseData.RefreshToken).to.be.a('string').and.to.have.lengthOf.at.least(1, \"RefreshToken should be a non-empty string\");",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
 			"request": {
 				"auth": {
 					"type": "basic",
@@ -217,7 +297,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"clientId\": \"4hnv88s25f68u0j2snjcu0sd04\"\n}",
+					"raw": "{\n    \"clientId\": \"2vlarp1fssdur4p36skkjr61a9\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -245,7 +325,7 @@
 					"bearer": [
 						{
 							"key": "token",
-							"value": "eyJraWQiOiJNcUltY2FOeWNQM2ZINGx6UXl0bzlUOGZPRjZZOUQ0a1VqUkhZQ2kwNjJjPSIsImFsZyI6IlJTMjU2In0.eyJzdWIiOiI0MzU0Mzg1Mi03MGIxLTcwYmItZWM4Ny04NWZiYTgxZjA5OWYiLCJpc3MiOiJodHRwczpcL1wvY29nbml0by1pZHAuZXUtY2VudHJhbC0xLmFtYXpvbmF3cy5jb21cL2V1LWNlbnRyYWwtMV9iZXdxWVdLaXIiLCJjbGllbnRfaWQiOiI0aG52ODhzMjVmNjh1MGoyc25qY3Uwc2QwNCIsIm9yaWdpbl9qdGkiOiI2YmExZjI4OC0xMmU3LTQxOGQtYTE3NS1mZWZjZDc5MzdhMTMiLCJldmVudF9pZCI6ImNhZTU4NWVlLTRhZDAtNDY2ZS05ZGFlLTg5ZDE0YmE1OWY0ZSIsInRva2VuX3VzZSI6ImFjY2VzcyIsInNjb3BlIjoiYXdzLmNvZ25pdG8uc2lnbmluLnVzZXIuYWRtaW4iLCJhdXRoX3RpbWUiOjE3MTc1ODQzNTIsImV4cCI6MTcxNzU4Nzk1MiwiaWF0IjoxNzE3NTg0MzUyLCJqdGkiOiIzZmQyNTU5YS1mZTQ1LTRkZWYtODk0My1kZWRiNWVhMTAxYWUiLCJ1c2VybmFtZSI6Ikxlcm5ncnVwcGUyIn0.BQE0_dJ3JrFCguLQJCm8ZIoe_SzXN4ENO41-o7yl8A-RdZTJJXGxw2n0AkmVTEcw1LAmLXu3R7FKgwh8zMzZKQBF9JvVKCzGPZONu2Ej6RUtNoPLse2oIJziXSGg4c4BgBQ_YO42-Gc_blYYAXiZIpClshU3INzmjHB7vCIAjzpfYY4IHsCTtGmZjZt5HemaZOinJKxMYrtQat46Jy0tom6gLpOrplPgd-kpZa521yRKdDxlOrzOvhE7yAHlatnOoy0ez83w0Wowclc-RWFQdR8eCrCv0cRntazbVdfhdvP2BDGmjHFEv9gS8nIQld3cfoyjOxWEnsqAV2uCOqIgog",
+							"value": "{{access_token}}",
 							"type": "string"
 						}
 					]
@@ -254,7 +334,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"token\": \"eyJjdHkiOiJKV1QiLCJlbmMiOiJBMjU2R0NNIiwiYWxnIjoiUlNBLU9BRVAifQ.Jd3QZox6zvNl4cjcGqAe7y0t-KdtfZIjSv80JKJcf-gZdPkM94N4qY5nzHvIyfU0Z2rkxGTB9-d0uFlY63QEZbTu1wFxI7i2Sd2YW6kSfPQPmoExjmZs9g3bOUBnZ-3EbVYnKHlfTzxpYHJl1khAsIkf_ZxlHEiRU5zcsOf1dNQ3nzzwCVOu_wk76IF9vFbY4xpu4S6KfeCcVpMv3uPl0J3h1wUwo6yVaJVMg6svTm6LUe1yE4pjkTCpm-qAkA9XM6QjFgJZRgESj4eSEYQTYddXS2v2TOpi2PoZwRVdRbQBCbE2rS8AxWi__jax-9BgoBpuWzk-pXZWmciP7SWL6w.l01kZAVpKL3WWCpU.LDGyI34t5dNhz9qomQYrX3oiZUgI1Jttmc7TqomTBlsLeG3Jm0zLO3lmN-h2Jq89LRMPrVFxwgjiAvrSH6kEhJ_0ddW6Jk_N9K26rUSb5WgyeCGGmD3SDS7k_NN6qospcegFgirEstg29f9GV7c-SSVJAMfHDEHLJP_MeQvMRLpCzrYjrtNOnkRM2l3olgY9pFj7dK5WxfHh6jSRr0vrkKwaNxfpdjJjE0FZa5dJMztw-Yjl1vseJ_yJZK3qFgsPrkuDi8itRPwzDy1H46m9oU2fz30XnbY4sigmDvApXw-54Rth5T8K3Z2HzXCq931mIIlITZKtV3LAciqD1a0TMbZWvuWSHeanqWCZJssA13KkYKX0bn3q-rWiiHpyJOTyQHKYULsheOV8WaYZ9bIyp_Wlj8PZhvsa8cxPV7LpqilCYd5upM534PPGDGTRkhBQiT3LdiwOHuN8cfjMuttxSSUsTHbJ2UTw7UnsNOp9YcKxfqVLjjaK9CDffgWHT6NCYZ7vhHsHyXEA9Gd6FDIbhYUpkYfTDeEM5Z61Ad8zCudZnQ1aJ_AOp_ZITDEwcO7kEq-c_e0xetqBDH1EHfTuRg6wIrGcyE7vh4hKQ-YgwQxsxbTDOBZXXrxvhl4HRiCwpTC-SUF1hTUkfm1hRj1YxOVxlsB7ta_9KwOfQN3uwHWkuUl_3Oi_pNURPsvXxNz_rYo9VzEBS9-JnQaU7POUqtlydqi8kqbArRcvvBaZCI0HTu-x2nT9N_UxpuRnN_1V2r8TEkQCfUI1EP9yov8i-DoT5QU89nJI6hNLtznAXe0TWPnl_8kZrmV-fSAPAXLX8xvbDKo6zVefrqwU44A7Y8x4LEIxkNWUD5bOJ3Q93Fax7aB5-WQIE-Xz2qVeL0ycyYeSPlOrXaDDgb4aqf02ILhuBAKcsxfQOL_phTUkG9PmNZ9WhuTVaMRXVq7FV1TvT9sqpYQobGVNPTsduBQKJ7uT0-O17-s1at-r-F5DeZuw-ti25tJGPxcBtbF9MLxrAZ2n3rosMFA2KaaCFVtKacs2CLvlzy5A906rVhRaz0LYxnlUzqjn2i7ur2vtNvXbQm_kYqlYQK0e8pK9gZqW_D8lj1FSMft0p7OCPDfUma8JycRyIXIgpaFmdtD-3pV5N5cVGCOryoj6YjvtngALpbMEQSE1SlmIqzk63s1yLVjwVMYFTm6bWiZTHQTavxmvoEeFhHVhzKp5LogVa1X65z0q9HTMUJAEPa5tpWYtE69MyVj4BYbTufh8NfSZYwDsmrs3R1XztbLJzGYFpC1S0XzG.mIydKSfKNZY9k3Vxj-3kzA\",\n    \"clientId\": \"4hnv88s25f68u0j2snjcu0sd04\"\n}",
+					"raw": "{\n    \"token\": \"eyJjdHkiOiJKV1QiLCJlbmMiOiJBMjU2R0NNIiwiYWxnIjoiUlNBLU9BRVAifQ.SeN8rIgcS8Tv16eInLQwZsUvhkua3NvYutkCU9JyzjtRLTbQUD38hQrlyrtDgDXYOMJlJKpS8xXXrlQzaqGaXlZ83_-0IEms6m0ezoj6Yfr-jTQqpzNBgwgnfgDQBh0i9HaS8BAwILJC1HN7-qs_zr3e2hD1Lrt16U69YuPxpQ6j7Q2ZfoM8FIrxatYVXCUlsX5gNBgZ-K1_Zt1teZVQL5I1v0SCLDEOZYNSBfr_QN1XQmLy-yC7Kw4Vha46lXTv1O5VFwwC6MTxvYf5D71OaJ5MVyetR7luuw1GuBskldRNw4Pg3sFcQVuuKLrPRBgOlnJrwSK-fnLmlaBIuy3zfQ.jNmPqe_nP1sIe_N2.pkCs8Hb4jgNUxLQEzzLvOKeF5aCRoRE70BDyhtjg0FGVG_oZPfuzYuU-PDCssQ6V767qpqajJDMmNar2KHdaUjXjGB76p94Z-S4Ti31h4_gerRiEB7ujg8ibDhtdhtiIsiG2090Y53wPI9l3shjN7NcBmVrspnEpp_f98QawHw6gzy1LPIjVsfpJ05pm9kjS31i2RQcOLwROZeMVLcgz7XxP88w3DJwa7oM-7mRLiMnhhRgJ4akbC2TLuyfDXWf78rnLGZKO0zKoVzOAIjoJyXb6kLwcMAa7wXZv2Pn8OxlbnKhnk0cKKx83KTeR27x4pc92cMZcpM1936VCpXgaq_3LqXqQGOE9vkleD9DWsQ1IR8d_1K9bKsZ_Txo3Xs0I0WJrt8wAfVw6Wl9aj2Ro_D6-Q6niyTvsWY1yoKpg2CsNqOmnmyUjp5c1sM3jVbZNXqpokZm3CTvZ6pGwPo-ZzN1ciybz1P6Z7a-sMAvqLnzXVIhPzFznYT86jYEVZ4gAev5jA4NovEi7O0_f3CKfZpgDBS3EENIAmw6tPlMf7a4tBqanQ5GO51BIuV_Fxdr0HWGc_mEzsyOtf_ivCSOLD7VKz7gk06YiSWFrp1d633uOBBRe3x4wm5fGqlFLZmKWbzjXNlIa_t_PTsvxuyzn0Mvv4nLw4Oy1_nJ7rwAgT3ftRkLvkWy2wDkX-eFBVdusx6OLxXEAv2lhNvJfddl-ljiHPRZEYrpOB2Qw0JQIMPojmNFBsy0fOWe77IIVIFdXaMGsfyqqpOOtj5hQb8Z3RIASOpEtok3XOIgDtvy96MVVaY5dse0QmPvLltq02CMIZZrP_L8lB6mLT9isgcJ1zI3gg6eHRDkxZEHOiGQrngyeiXM3MhnOyBA4S7-TkJ3rfaWS_-WxqRGd9TiVR5mWuTWyhEfSVnVV72O-O_l-yQUhVDDoQ9UY_TyqXP6tZxc3trRGuHeULvNU7TvmrMr9pOzxB9EPrk8fHytvOI8jkY51DHttxsAU1anYobUZVZIrRt7-mL7muVGNcT1PuWL-nzI4GcmwYRDF2veMUJrjs4zepYA4eb0QwE1WEEum1IU-uDnnyRByzZaYAhdP_QUVMfRIxSm0oSZ5ACkQpHPzJm5t-q5csiQd0oNWQeNhOXXEjWZs3h6zA2hlqVxst6L1nE6wZRdi3IwhC1uLYVEqfw5OxbnvCeHNMBViHgGnm1uNR7Z2YdKzCcxLnKIqHRBBQJV2De9RH22NVv_0SI5nssCL9we0KUPYHPh4Sqhll65VIWcMqMpwVHCKDzjf1WwfoXDN.TtaQvdn83tGErvsxIdhDYw\",\n    \"clientId\": \"4hnv88s25f68u0j2snjcu0sd04\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -269,6 +349,34 @@
 					"path": [
 						"users",
 						"logout"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "DeleteCartItem",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{access_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{aws_url}}/cart/978-3404175048",
+					"host": [
+						"{{aws_url}}"
+					],
+					"path": [
+						"cart",
+						"978-3404175048"
 					]
 				}
 			},

@@ -1,6 +1,7 @@
 package route53
 
 import (
+	"fmt"
 	"github.com/pulumi/pulumi-aws/sdk/v6/go/aws/apigatewayv2"
 	"github.com/pulumi/pulumi-aws/sdk/v6/go/aws/route53"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
@@ -19,8 +20,10 @@ func Record(ctx *pulumi.Context, name string, zone *route53.Zone, apigateway *ap
 		Type: pulumi.String("A"),
 		Aliases: route53.RecordAliasArray{
 			&route53.RecordAliasArgs{
-				Name:                 apigateway.ApiEndpoint,
-				ZoneId:               pulumi.String("ZLY8HYME6SFDD"),
+				Name: apigateway.ApiEndpoint,
+				ZoneId: zone.ZoneId.ApplyT(func(zoneId string) string {
+					return fmt.Sprintf("%s", zoneId)
+				}).(pulumi.StringOutput),
 				EvaluateTargetHealth: pulumi.Bool(false),
 			},
 		},

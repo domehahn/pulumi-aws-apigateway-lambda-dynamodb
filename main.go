@@ -16,12 +16,6 @@ import (
 	lambdaFn "pulumi-00/pkg/infrastructure/lambda"
 )
 
-type RouteConfig struct {
-	function    *lambda.Function
-	integration *apigatewayv2.Integration
-	routePath   string
-}
-
 func main() {
 	pulumi.Run(func(ctx *pulumi.Context) error {
 		//############################
@@ -80,7 +74,7 @@ func main() {
 			return err
 		}
 
-		_, err = iam2.AttachedPolicy(ctx, "lambdaLogGroupRoleAttachment", lambdaRole, pulumi.String("arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole").ToStringOutput())
+		_, err = iam2.AttachedPolicy(ctx, "lambdaRoleAttachment", lambdaRole, pulumi.String("arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole").ToStringOutput())
 		if err != nil {
 			return err
 		}
@@ -111,6 +105,8 @@ func main() {
 			bookTableEnv,
 			[]*iam.RolePolicyAttachment{bookAttachedPolicy, tokenInvalidateAttachedPolicy})
 
+		_, err = cloudwatch.LogGroup(ctx, "getBooksLogGroup", "/aws/lambda/", getBooksFn.Name)
+
 		getBookFn, err := lambdaFn.LamdbaFunction(
 			ctx,
 			"getBook",
@@ -118,6 +114,8 @@ func main() {
 			"./function/book",
 			lambdaRole, tableBook, bookTableEnv,
 			[]*iam.RolePolicyAttachment{bookAttachedPolicy})
+
+		_, err = cloudwatch.LogGroup(ctx, "getBookLogGroup", "/aws/lambda/", getBookFn.Name)
 
 		getCartItemsFn, err := lambdaFn.LamdbaFunction(
 			ctx,
@@ -127,6 +125,8 @@ func main() {
 			lambdaRole,
 			tableCartItem, cartItemTableEnv,
 			[]*iam.RolePolicyAttachment{cartItemAttachedPolicy})
+
+		_, err = cloudwatch.LogGroup(ctx, "cartItemsLogGroup", "/aws/lambda/", getCartItemsFn.Name)
 
 		multiTableEnv := pulumi.StringMap{
 			"DYNAMODB_TABLE_NAME": tableCartItem.Name,
@@ -141,6 +141,8 @@ func main() {
 			tableCartItem, multiTableEnv,
 			[]*iam.RolePolicyAttachment{cartItemAttachedPolicy, bookAttachedPolicy})
 
+		_, err = cloudwatch.LogGroup(ctx, "addCartItemLogGroup", "/aws/lambda/", addCartItemFn.Name)
+
 		deleteCartItemFn, err := lambdaFn.LamdbaFunction(
 			ctx,
 			"deleteCartItem",
@@ -149,6 +151,8 @@ func main() {
 			lambdaRole,
 			tableCartItem, multiTableEnv,
 			[]*iam.RolePolicyAttachment{cartItemAttachedPolicy, bookAttachedPolicy})
+
+		_, err = cloudwatch.LogGroup(ctx, "deleteCartItemLogGroup", "/aws/lambda/", deleteCartItemFn.Name)
 
 		// ### Admin functions ###
 		createBookFn, err := lambdaFn.LamdbaFunction(
@@ -160,6 +164,8 @@ func main() {
 			tableBook, bookTableEnv,
 			[]*iam.RolePolicyAttachment{bookAttachedPolicy})
 
+		_, err = cloudwatch.LogGroup(ctx, "createBookLogGroup", "/aws/lambda/", createBookFn.Name)
+
 		updateBookFn, err := lambdaFn.LamdbaFunction(
 			ctx,
 			"updateBook",
@@ -168,6 +174,8 @@ func main() {
 			lambdaRole,
 			tableBook, bookTableEnv,
 			[]*iam.RolePolicyAttachment{bookAttachedPolicy})
+
+		_, err = cloudwatch.LogGroup(ctx, "updateBookLogGroup", "/aws/lambda/", updateBookFn.Name)
 
 		multiTableEnv = pulumi.StringMap{
 			"DYNAMODB_TABLE_NAME": tableBook.Name,
@@ -182,6 +190,8 @@ func main() {
 			tableBook, multiTableEnv,
 			[]*iam.RolePolicyAttachment{bookAttachedPolicy})
 
+		_, err = cloudwatch.LogGroup(ctx, "deleteBookLogGroup", "/aws/lambda/", deleteBookFn.Name)
+
 		// ### Authorization and Authentication functions ###
 		loginFn, err := lambdaFn.LamdbaFunction(
 			ctx,
@@ -193,6 +203,8 @@ func main() {
 			tokenInvalidateTableEnv,
 			[]*iam.RolePolicyAttachment{tokenInvalidateAttachedPolicy})
 
+		_, err = cloudwatch.LogGroup(ctx, "loginLogGroup", "/aws/lambda/", loginFn.Name)
+
 		logoutFn, err := lambdaFn.LamdbaFunction(
 			ctx,
 			"logout",
@@ -203,6 +215,8 @@ func main() {
 			tokenInvalidateTableEnv,
 			[]*iam.RolePolicyAttachment{tokenInvalidateAttachedPolicy})
 
+		_, err = cloudwatch.LogGroup(ctx, "logoutLogGroup", "/aws/lambda/", logoutFn.Name)
+
 		authorizeFn, err := lambdaFn.LamdbaFunction(
 			ctx,
 			"authorize",
@@ -212,6 +226,8 @@ func main() {
 			tableTokenInvalidate,
 			tokenInvalidateTableEnv,
 			[]*iam.RolePolicyAttachment{tokenInvalidateAttachedPolicy})
+
+		_, err = cloudwatch.LogGroup(ctx, "authorizeLogGroup", "/aws/lambda/", authorizeFn.Name)
 
 		if err != nil {
 			errorhandler.HandlingError("Error creating lambda.")
@@ -261,27 +277,6 @@ func main() {
 		}
 
 		//############################
-		// Api LogGroup
-		logGroup, err := cloudwatch.LogGroup(ctx, "apigatewayLogGroup", "/aws/apigateway/log-group")
-		if err != nil {
-			return err
-		}
-
-		//############################
-		// Api Gateway role
-		gatewayRole, err := iam2.Role(ctx, "apigatewayRole", "apigateway.amazonaws.com")
-		if err != nil {
-			errorhandler.HandlingError("Error creating API-Gateway role.")
-		}
-
-		//############################
-		// Api Gateway role Policies
-		_, err = iam2.AttachedPolicy(ctx,
-			"apigatewayLogGroupRoleAttachment",
-			gatewayRole,
-			pulumi.String("arn:aws:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs").ToStringOutput())
-
-		//############################
 		// Api Gateway
 		apiGateway, err := apigateway2.ApiGateway(ctx, "ApiGateway")
 		if err != nil {
@@ -289,129 +284,125 @@ func main() {
 		}
 
 		//############################
+		// Api LogGroup
+		logGroup, err := cloudwatch.LogGroup(ctx, "apiGatewayLogGroup", "/aws/apigateway/", apiGateway.Name)
+		if err != nil {
+			return err
+		}
+
+		//############################
+		// Api Gateway role
+		gatewayRole, err := iam2.Role(ctx, "apiGatewayRole", "apigateway.amazonaws.com")
+		if err != nil {
+			errorhandler.HandlingError("Error creating API-Gateway role.")
+		}
+
+		//############################
+		// Api Gateway role Policies
+		_, err = iam.NewRolePolicyAttachment(ctx, "apiGatewayLogRolePolicy", &iam.RolePolicyAttachmentArgs{
+			Role:      gatewayRole.Name,
+			PolicyArn: pulumi.String("arn:aws:iam::aws:policy/CloudWatchLogsFullAccess"),
+		})
+
+		//############################
 		// Api Gateway Lambda Permission
-		_, err = lambdaFn.LambdaPermission(ctx, "bookPermission", getBookFn, apiGateway)
 
-		_, err = lambdaFn.LambdaPermission(ctx, "booksPermission", getBooksFn, apiGateway)
+		lambdaPermissions := []struct {
+			name     string
+			lambdaFn *lambda.Function
+		}{
+			{"bookPermission", getBookFn},
+			{"booksPermission", getBooksFn},
+			{"createBookPermission", createBookFn},
+			{"updateBookPermission", updateBookFn},
+			{"deleteBookPermission", deleteBookFn},
+			{"cartItemsPermission", getCartItemsFn},
+			{"addCartItemPermission", addCartItemFn},
+			{"deleteCartItemPermission", deleteCartItemFn},
+			{"loginPermission", loginFn},
+			{"logoutPermission", logoutFn},
+			{"authorizePermission", authorizeFn},
+		}
 
-		_, err = lambdaFn.LambdaPermission(ctx, "createBookPermission", createBookFn, apiGateway)
-
-		_, err = lambdaFn.LambdaPermission(ctx, "updateBookPermission", updateBookFn, apiGateway)
-
-		_, err = lambdaFn.LambdaPermission(ctx, "deleteBookPermission", deleteBookFn, apiGateway)
-
-		_, err = lambdaFn.LambdaPermission(ctx, "cartItemsPermission", getCartItemsFn, apiGateway)
-
-		_, err = lambdaFn.LambdaPermission(ctx, "addCartItemPermission", addCartItemFn, apiGateway)
-
-		_, err = lambdaFn.LambdaPermission(ctx, "deleteCartItemPermission", deleteCartItemFn, apiGateway)
-
-		_, err = lambdaFn.LambdaPermission(ctx, "loginPermission", loginFn, apiGateway)
-
-		_, err = lambdaFn.LambdaPermission(ctx, "logoutPermission", logoutFn, apiGateway)
-
-		_, err = lambdaFn.LambdaPermission(ctx, "authorizePermission", authorizeFn, apiGateway)
+		for _, lambdaPermission := range lambdaPermissions {
+			_, err = lambdaFn.LambdaPermission(ctx, lambdaPermission.name, lambdaPermission.lambdaFn, apiGateway)
+			if err != nil {
+				return err
+			}
+		}
 
 		//############################
 		// Api Authorizer
-		authorizer, err := apigateway2.Authorizer(ctx, "Authorizer", apiGateway, userPool, userPoolClient)
-		if err != nil {
-			errorhandler.HandlingError("Error creating authorizer.")
-		}
-
 		lambdaAuthorizer, err := apigateway2.LambdaAuthorizer(ctx, "AuthorizerTest", apiGateway, authorizeFn)
 		if err != nil {
 			errorhandler.HandlingError("Error creating authorizer.")
 		}
 
 		//############################
-		// Api Integrations
-		bookIntegration, err := apigateway2.Integration(ctx, "bookIntegration", apiGateway, getBookFn)
+		// Api Integrations and Routes
+		var routes []*apigatewayv2.Route
 
-		booksIntegration, err := apigateway2.Integration(ctx, "booksIntegration", apiGateway, getBooksFn)
-
-		createBookIntegration, err := apigateway2.Integration(ctx, "createBookIntegration", apiGateway, createBookFn)
-
-		updateBookIntegration, err := apigateway2.Integration(ctx, "updateBookIntegration", apiGateway, updateBookFn)
-
-		deleteBookIntegration, err := apigateway2.Integration(ctx, "deleteBookIntegration", apiGateway, deleteBookFn)
-
-		cartItemsIntegration, err := apigateway2.Integration(ctx, "cartItemsIntegration", apiGateway, getCartItemsFn)
-
-		addCartItemIntegration, err := apigateway2.Integration(ctx, "addCartItemIntegration", apiGateway, addCartItemFn)
-
-		deleteCartItemIntegration, err := apigateway2.Integration(ctx, "deleteCartItemIntegration", apiGateway, deleteCartItemFn)
-
-		loginIntegration, err := apigateway2.Integration(ctx, "loginIntegration", apiGateway, loginFn)
-
-		logoutIntegration, err := apigateway2.Integration(ctx, "logoutIntegration", apiGateway, logoutFn)
-
-		if err != nil {
-			errorhandler.HandlingError("Error creating integration.")
+		integrations := []struct {
+			name       string
+			httpMethod string
+			path       string
+			function   *lambda.Function
+		}{
+			{"bookIntegration", "GET", "/books/{isbn}", getBookFn},
+			{"booksIntegration", "GET", "/books", getBooksFn},
+			{"createBookIntegration", "POST", "/books", createBookFn},
+			{"updateBookIntegration", "PATCH", "/books/{isbn}", updateBookFn},
+			{"deleteBookIntegration", "DELETE", "/books/{isbn}", deleteBookFn},
+			{"cartItemsIntegration", "GET", "/cart", getCartItemsFn},
+			{"addCartItemIntegration", "POST", "/cart", addCartItemFn},
+			{"deleteCartItemIntegration", "DELETE", "/cart/{isbn}", deleteCartItemFn},
+			{"loginIntegration", "POST", "/users/login", loginFn},
+			{"logoutIntegration", "POST", "/users/logout", logoutFn},
 		}
 
-		bookRoute, err := apigateway2.Route(ctx, "bookRoute", apiGateway, "GET /books/{isbn}", bookIntegration, authorizer)
+		for _, integration := range integrations {
+			apiIntegration, err := apigateway2.Integration(ctx, integration.name, apiGateway, integration.function)
+			if err != nil {
+				return err
+			}
 
-		//booksRoute, err := apigateway2.Route(ctx, "booksRoute", apiGateway, "GET /books", booksIntegration, authorizer)
+			var route *apigatewayv2.Route
+			if integration.name == "loginIntegration" {
+				route, err = apigateway2.RouteWithoutAuthorizer(ctx, fmt.Sprintf("%sRoute", integration.name), apiGateway, integration.httpMethod+" "+integration.path, apiIntegration)
+			} else {
+				route, err = apigateway2.LambdaAuthorizerRoute(ctx, fmt.Sprintf("%sRoute", integration.name), apiGateway, integration.httpMethod+" "+integration.path, apiIntegration, lambdaAuthorizer)
+			}
 
-		booksRoute, err := apigateway2.RouteTest(ctx, "booksRoute", apiGateway, "GET /books", booksIntegration, lambdaAuthorizer)
+			if err != nil {
+				return err
+			}
 
-		_, err = lambda.NewPermission(ctx, "invokePermission", &lambda.PermissionArgs{
-			Action:    pulumi.String("lambda:InvokeFunction"),
-			Function:  authorizeFn.Arn,
-			Principal: pulumi.String("lambda.amazonaws.com"),
-			SourceArn: getBooksFn.Arn,
-		})
-
-		createBookRoute, err := apigateway2.Route(ctx, "createBookRoute", apiGateway, "POST /books", createBookIntegration, authorizer)
-
-		updateBookRoute, err := apigateway2.Route(ctx, "updateBookRoute", apiGateway, "PATCH /books/{isbn}", updateBookIntegration, authorizer)
-
-		deleteBookRoute, err := apigateway2.Route(ctx, "deleteBookRoute", apiGateway, "DELETE /books/{isbn}", deleteBookIntegration, authorizer)
-
-		cartItemsRoute, err := apigateway2.Route(ctx, "cartItemsRoute", apiGateway, "GET /cart", cartItemsIntegration, authorizer)
-
-		addCartItemRoute, err := apigateway2.Route(ctx, "addCartItemRoute", apiGateway, "POST /cart", addCartItemIntegration, authorizer)
-
-		deleteCartItemRoute, err := apigateway2.Route(ctx, "deleteCartItemRoute", apiGateway, "DELETE /cart/{isbn}", deleteCartItemIntegration, authorizer)
-
-		loginRoute, err := apigateway2.RouteWithoutAuthorizer(ctx, "loginRoute", apiGateway, "POST /users/login", loginIntegration)
-
-		logoutRoute, err := apigateway2.Route(ctx, "logoutRoute", apiGateway, "POST /users/logout", logoutIntegration, authorizer)
-		if err != nil {
-			errorhandler.HandlingError("Error creating route.")
+			routes = append(routes, route)
 		}
 
 		//############################
 		// Api Deployment
-		apiDeployment, err := apigateway2.Deploy(ctx, "apiDeployment", apiGateway, []*apigatewayv2.Route{
-			booksRoute,
-			bookRoute,
-			createBookRoute,
-			updateBookRoute,
-			deleteBookRoute,
-			cartItemsRoute,
-			addCartItemRoute,
-			deleteCartItemRoute,
-			loginRoute,
-			logoutRoute})
+		apiDeployment, err := apigateway2.Deploy(ctx, "apiDeployment", apiGateway, routes)
 		if err != nil {
 			errorhandler.HandlingError("Error creating deployment.")
 		}
 
 		//############################
 		// Api Stage
-		_, err = apigateway2.Stage(ctx, "stage", apiDeployment, apiGateway, logGroup)
+		stage, err := apigateway2.Stage(ctx, "stage", apiDeployment, apiGateway, logGroup)
 		if err != nil {
 			errorhandler.HandlingError("Error creating stage.")
 		}
 
-		fullApiUrl := apiGateway.ApiEndpoint.ApplyT(func(endpoint string) string {
+		fullApiUrl := pulumi.Sprintf("%s/%s", apiGateway.ApiEndpoint, stage.Name).ApplyT(func(endpoint string) string {
 			return fmt.Sprintf("%s", endpoint)
 		}).(pulumi.StringOutput)
 
 		// The URL at which the REST API will be served
 		ctx.Export("apiEndpoint", fullApiUrl)
+
+		// Export the User Pool Client ID
+		ctx.Export("userPoolClientId", userPoolClient.ID())
 
 		return nil
 	})
