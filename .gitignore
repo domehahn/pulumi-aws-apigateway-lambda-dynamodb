@@ -65,3 +65,4 @@ tmp/
 # Go workspace file
 go.work
 go.work.sum
+.gitlab-ci-local
