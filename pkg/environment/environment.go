@@ -37,5 +37,5 @@ func ViperGetEnvVariable(key string) (string, error) {
 		return "", err
 	}
 
-	return value, nil
+	return value, err
 }

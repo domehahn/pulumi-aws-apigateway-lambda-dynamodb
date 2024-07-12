@@ -14,27 +14,32 @@ tasks:
   lint:
     desc: Lint the code
     cmds:
-      - golangci-lint run
+      - golangci-lint run ./...
 
   aws-configure-sso:
-    dec: Configure AWS cli with single sign on
+    desc: Configure AWS cli with single sign on
     cmds:
       - aws configure sso
 
   aws-configure:
-    dec: Configure AWS cli
+    desc: Configure AWS cli
     cmds:
       - aws configure
 
   pulumi-config:
-    dec: Configure pulumi cli
+    desc: Configure pulumi cli
     cmds:
       - pulumi config set aws:profile AWS-Training
       - pulumi config set aws:region eu-central-1
       - pulumi stack select domehahn/pulumi-00/aws-apigateway-lambda-dynamodb
 
+  pulumi-preview:
+    desc: Dry run of pulumi
+    cmds:
+      - pulumi preview
+
   pulumi-up:
-    dec: Start pulumi aws deployment
+    desc: Start pulumi aws deployment
     cmds:
       - pulumi up --yes
 

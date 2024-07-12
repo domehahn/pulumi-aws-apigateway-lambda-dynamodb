@@ -63,7 +63,7 @@ func Integration(ctx *pulumi.Context, name string, apigateway *apigatewayv2.Api,
 func Route(ctx *pulumi.Context, name string, apiGateway *apigatewayv2.Api, routeKey string, integration *apigatewayv2.Integration, authorizer *apigatewayv2.Authorizer) (*apigatewayv2.Route, error) {
 	route, err := apigatewayv2.NewRoute(ctx, name, &apigatewayv2.RouteArgs{
 		ApiId:    apiGateway.ID(),
-		RouteKey: pulumi.String(fmt.Sprintf("%s", routeKey)),
+		RouteKey: pulumi.String(routeKey),
 		Target: integration.ID().ApplyT(func(id pulumi.ID) (string, error) {
 			return fmt.Sprintf("integrations/%s", id), nil
 		}).(pulumi.StringOutput),
@@ -76,7 +76,7 @@ func Route(ctx *pulumi.Context, name string, apiGateway *apigatewayv2.Api, route
 func LambdaAuthorizerRoute(ctx *pulumi.Context, name string, apiGateway *apigatewayv2.Api, routeKey string, integration *apigatewayv2.Integration, authorizer *apigatewayv2.Authorizer) (*apigatewayv2.Route, error) {
 	route, err := apigatewayv2.NewRoute(ctx, name, &apigatewayv2.RouteArgs{
 		ApiId:             apiGateway.ID(),
-		RouteKey:          pulumi.String(fmt.Sprintf("%s", routeKey)),
+		RouteKey:          pulumi.String(routeKey),
 		AuthorizationType: pulumi.String("CUSTOM"),
 		AuthorizerId:      authorizer.ID(),
 		Target: integration.ID().ApplyT(func(id pulumi.ID) (string, error) {
@@ -89,7 +89,7 @@ func LambdaAuthorizerRoute(ctx *pulumi.Context, name string, apiGateway *apigate
 func RouteWithoutAuthorizer(ctx *pulumi.Context, name string, apigateway *apigatewayv2.Api, routeKey string, integration *apigatewayv2.Integration) (*apigatewayv2.Route, error) {
 	route, err := apigatewayv2.NewRoute(ctx, name, &apigatewayv2.RouteArgs{
 		ApiId:    apigateway.ID(),
-		RouteKey: pulumi.String(fmt.Sprintf("%s", routeKey)),
+		RouteKey: pulumi.String(routeKey),
 		Target: integration.ID().ApplyT(func(id pulumi.ID) (string, error) {
 			return fmt.Sprintf("integrations/%s", id), nil
 		}).(pulumi.StringOutput),

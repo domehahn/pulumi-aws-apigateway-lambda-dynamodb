@@ -1,0 +1,33 @@
+stages:
+  - build
+  - lint
+  - test
+  - deploy
+
+before_script:
+  - export GOPATH=$(go env GOPATH)
+  - export PATH=$PATH:$GOPATH/bin
+  - go version
+  - pulumi version
+
+build:
+  stage: build
+  script:
+    - go mod download
+    - go build -o myapp
+
+lint:
+  stage: lint
+  script:
+    - task lint
+
+test:
+  stage: test
+  script:
+    - task test
+    # Run linting here if you have a specific linting tool for Go
+
+deploy:
+  stage: deploy
+  script:
+    - task pulumi-up

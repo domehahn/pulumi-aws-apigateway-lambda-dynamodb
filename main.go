@@ -59,22 +59,38 @@ func main() {
 
 		//############################
 		// Attached Policies
-		bookAttachedPolicy, err := iam2.AttachedPolicy(ctx, "bookLambdaDynamoDbRoleAttachment", lambdaRole, tableBookPolicy.Arn)
+		bookAttachedPolicy, err := iam2.AttachedPolicy(
+			ctx,
+			"bookLambdaDynamoDbRoleAttachment",
+			lambdaRole,
+			tableBookPolicy.Arn)
 		if err != nil {
 			return err
 		}
 
-		cartItemAttachedPolicy, err := iam2.AttachedPolicy(ctx, "cartItemLambdaDynamoDbRoleAttachment", lambdaRole, tableCartItemPolicy.Arn)
+		cartItemAttachedPolicy, err := iam2.AttachedPolicy(
+			ctx,
+			"cartItemLambdaDynamoDbRoleAttachment",
+			lambdaRole,
+			tableCartItemPolicy.Arn)
 		if err != nil {
 			return err
 		}
 
-		tokenInvalidateAttachedPolicy, err := iam2.AttachedPolicy(ctx, "tokenInvalidateLambdaDynamoDbRoleAttachment", lambdaRole, tableTokenInvalidatePolicy.Arn)
+		tokenInvalidateAttachedPolicy, err := iam2.AttachedPolicy(
+			ctx,
+			"tokenInvalidateLambdaDynamoDbRoleAttachment",
+			lambdaRole,
+			tableTokenInvalidatePolicy.Arn)
 		if err != nil {
 			return err
 		}
 
-		_, err = iam2.AttachedPolicy(ctx, "lambdaRoleAttachment", lambdaRole, pulumi.String("arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole").ToStringOutput())
+		_, err = iam2.AttachedPolicy(
+			ctx,
+			"lambdaRoleAttachment",
+			lambdaRole,
+			pulumi.String("arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole").ToStringOutput())
 		if err != nil {
 			return err
 		}
@@ -104,8 +120,14 @@ func main() {
 			tableBook,
 			bookTableEnv,
 			[]*iam.RolePolicyAttachment{bookAttachedPolicy, tokenInvalidateAttachedPolicy})
+		if err != nil {
+			return err
+		}
 
 		_, err = cloudwatch.LogGroup(ctx, "getBooksLogGroup", "/aws/lambda/", getBooksFn.Name)
+		if err != nil {
+			return err
+		}
 
 		getBookFn, err := lambdaFn.LamdbaFunction(
 			ctx,
@@ -114,8 +136,14 @@ func main() {
 			"./function/book",
 			lambdaRole, tableBook, bookTableEnv,
 			[]*iam.RolePolicyAttachment{bookAttachedPolicy})
+		if err != nil {
+			return err
+		}
 
 		_, err = cloudwatch.LogGroup(ctx, "getBookLogGroup", "/aws/lambda/", getBookFn.Name)
+		if err != nil {
+			return err
+		}
 
 		getCartItemsFn, err := lambdaFn.LamdbaFunction(
 			ctx,
@@ -125,8 +153,14 @@ func main() {
 			lambdaRole,
 			tableCartItem, cartItemTableEnv,
 			[]*iam.RolePolicyAttachment{cartItemAttachedPolicy})
+		if err != nil {
+			return err
+		}
 
 		_, err = cloudwatch.LogGroup(ctx, "cartItemsLogGroup", "/aws/lambda/", getCartItemsFn.Name)
+		if err != nil {
+			return err
+		}
 
 		multiTableEnv := pulumi.StringMap{
 			"DYNAMODB_TABLE_NAME": tableCartItem.Name,
@@ -140,8 +174,14 @@ func main() {
 			lambdaRole,
 			tableCartItem, multiTableEnv,
 			[]*iam.RolePolicyAttachment{cartItemAttachedPolicy, bookAttachedPolicy})
+		if err != nil {
+			return err
+		}
 
 		_, err = cloudwatch.LogGroup(ctx, "addCartItemLogGroup", "/aws/lambda/", addCartItemFn.Name)
+		if err != nil {
+			return err
+		}
 
 		deleteCartItemFn, err := lambdaFn.LamdbaFunction(
 			ctx,
@@ -151,8 +191,14 @@ func main() {
 			lambdaRole,
 			tableCartItem, multiTableEnv,
 			[]*iam.RolePolicyAttachment{cartItemAttachedPolicy, bookAttachedPolicy})
+		if err != nil {
+			return err
+		}
 
 		_, err = cloudwatch.LogGroup(ctx, "deleteCartItemLogGroup", "/aws/lambda/", deleteCartItemFn.Name)
+		if err != nil {
+			return err
+		}
 
 		// ### Admin functions ###
 		createBookFn, err := lambdaFn.LamdbaFunction(
@@ -163,8 +209,14 @@ func main() {
 			lambdaRole,
 			tableBook, bookTableEnv,
 			[]*iam.RolePolicyAttachment{bookAttachedPolicy})
+		if err != nil {
+			return err
+		}
 
 		_, err = cloudwatch.LogGroup(ctx, "createBookLogGroup", "/aws/lambda/", createBookFn.Name)
+		if err != nil {
+			return err
+		}
 
 		updateBookFn, err := lambdaFn.LamdbaFunction(
 			ctx,
@@ -174,8 +226,14 @@ func main() {
 			lambdaRole,
 			tableBook, bookTableEnv,
 			[]*iam.RolePolicyAttachment{bookAttachedPolicy})
+		if err != nil {
+			return err
+		}
 
 		_, err = cloudwatch.LogGroup(ctx, "updateBookLogGroup", "/aws/lambda/", updateBookFn.Name)
+		if err != nil {
+			return err
+		}
 
 		multiTableEnv = pulumi.StringMap{
 			"DYNAMODB_TABLE_NAME": tableBook.Name,
@@ -189,8 +247,14 @@ func main() {
 			lambdaRole,
 			tableBook, multiTableEnv,
 			[]*iam.RolePolicyAttachment{bookAttachedPolicy})
+		if err != nil {
+			return err
+		}
 
 		_, err = cloudwatch.LogGroup(ctx, "deleteBookLogGroup", "/aws/lambda/", deleteBookFn.Name)
+		if err != nil {
+			return err
+		}
 
 		// ### Authorization and Authentication functions ###
 		loginFn, err := lambdaFn.LamdbaFunction(
@@ -202,8 +266,14 @@ func main() {
 			tableTokenInvalidate,
 			tokenInvalidateTableEnv,
 			[]*iam.RolePolicyAttachment{tokenInvalidateAttachedPolicy})
+		if err != nil {
+			return err
+		}
 
 		_, err = cloudwatch.LogGroup(ctx, "loginLogGroup", "/aws/lambda/", loginFn.Name)
+		if err != nil {
+			return err
+		}
 
 		logoutFn, err := lambdaFn.LamdbaFunction(
 			ctx,
@@ -214,8 +284,14 @@ func main() {
 			tableTokenInvalidate,
 			tokenInvalidateTableEnv,
 			[]*iam.RolePolicyAttachment{tokenInvalidateAttachedPolicy})
+		if err != nil {
+			return err
+		}
 
 		_, err = cloudwatch.LogGroup(ctx, "logoutLogGroup", "/aws/lambda/", logoutFn.Name)
+		if err != nil {
+			return err
+		}
 
 		authorizeFn, err := lambdaFn.LamdbaFunction(
 			ctx,
@@ -226,11 +302,13 @@ func main() {
 			tableTokenInvalidate,
 			tokenInvalidateTableEnv,
 			[]*iam.RolePolicyAttachment{tokenInvalidateAttachedPolicy})
+		if err != nil {
+			return err
+		}
 
 		_, err = cloudwatch.LogGroup(ctx, "authorizeLogGroup", "/aws/lambda/", authorizeFn.Name)
-
 		if err != nil {
-			errorhandler.HandlingError("Error creating lambda.")
+			return err
 		}
 
 		//############################
@@ -257,8 +335,20 @@ func main() {
 		//############################
 		// Cognito User
 		username, err := environment.ViperGetEnvVariable("sensitive.user.username")
+		if err != nil {
+			return err
+		}
+
 		password, err := environment.ViperGetEnvVariable("sensitive.user.password")
+		if err != nil {
+			return err
+		}
+
 		email, err := environment.ViperGetEnvVariable("sensitive.user.email")
+		if err != nil {
+			return err
+		}
+
 		sensitiveUser := cognito.SensitiveUser{
 			Username: username,
 			Password: password,
@@ -303,6 +393,9 @@ func main() {
 			Role:      gatewayRole.Name,
 			PolicyArn: pulumi.String("arn:aws:iam::aws:policy/CloudWatchLogsFullAccess"),
 		})
+		if err != nil {
+			return err
+		}
 
 		//############################
 		// Api Gateway Lambda Permission
@@ -368,9 +461,24 @@ func main() {
 
 			var route *apigatewayv2.Route
 			if integration.name == "loginIntegration" {
-				route, err = apigateway2.RouteWithoutAuthorizer(ctx, fmt.Sprintf("%sRoute", integration.name), apiGateway, integration.httpMethod+" "+integration.path, apiIntegration)
+				route, err = apigateway2.RouteWithoutAuthorizer(
+					ctx,
+					fmt.Sprintf(
+						"%sRoute",
+						integration.name),
+					apiGateway,
+					integration.httpMethod+" "+integration.path,
+					apiIntegration)
 			} else {
-				route, err = apigateway2.LambdaAuthorizerRoute(ctx, fmt.Sprintf("%sRoute", integration.name), apiGateway, integration.httpMethod+" "+integration.path, apiIntegration, lambdaAuthorizer)
+				route, err = apigateway2.LambdaAuthorizerRoute(
+					ctx,
+					fmt.Sprintf(
+						"%sRoute",
+						integration.name),
+					apiGateway,
+					integration.httpMethod+" "+integration.path,
+					apiIntegration,
+					lambdaAuthorizer)
 			}
 
 			if err != nil {
@@ -395,7 +503,7 @@ func main() {
 		}
 
 		fullApiUrl := pulumi.Sprintf("%s/%s", apiGateway.ApiEndpoint, stage.Name).ApplyT(func(endpoint string) string {
-			return fmt.Sprintf("%s", endpoint)
+			return endpoint
 		}).(pulumi.StringOutput)
 
 		// The URL at which the REST API will be served

@@ -6,5 +6,5 @@ import (
 )
 
 func HandlingError(message string, details ...interface{}) {
-	log.Fatalln(errors.Errorf(message, details))
+	log.Fatalln(errors.Errorf(message, details...))
 }
