@@ -6,6 +6,7 @@ build/
 !**/src/test/**/build/
 
 pulumi-00
+myapp
 
 ### STS ###
 .apt_generated
