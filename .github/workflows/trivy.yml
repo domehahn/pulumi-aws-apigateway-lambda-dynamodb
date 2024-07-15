@@ -31,4 +31,4 @@ jobs:
 
       - name: Run Trivy Scan
         run: |
-          trivy filesystem --exit-code 1 --severity HIGH CRITICAL --no-progress ./go.sum
+          trivy filesystem --exit-code 1 --severity HIGH,CRITICAL --no-progress ./go.sum
