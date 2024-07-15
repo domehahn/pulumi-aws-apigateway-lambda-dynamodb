@@ -1,12 +1,9 @@
 module pulumi-00
 
-go 1.21
-
-toolchain go1.22.3
+go 1.22.5
 
 require (
 	github.com/pkg/errors v0.9.1
-	github.com/pulumi/pulumi-aws-apigateway/sdk/v2 v2.5.0
 	github.com/pulumi/pulumi-aws/sdk/v6 v6.5.0
 	github.com/pulumi/pulumi/sdk/v3 v3.116.1
 	github.com/spf13/viper v1.19.0
@@ -105,4 +102,5 @@ require (
 	gopkg.in/warnings.v0 v0.1.2 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	lukechampine.com/frand v1.4.2 // indirect
+	pgregory.net/rapid v0.6.1 // indirect
 )
