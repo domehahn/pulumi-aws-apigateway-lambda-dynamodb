@@ -1,0 +1,34 @@
+name: Trivy Scan
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  trivy_scan:
+    name: Scan Go dependencies with Trivy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.20'  # Specify the Go version used in your project
+
+      - name: Install Trivy
+        run: |
+          wget https://github.com/aquasecurity/trivy/releases/download/v0.18.3/trivy_0.18.3_Linux-64bit.tar.gz
+          tar zxvf trivy_0.18.3_Linux-64bit.tar.gz
+          sudo mv trivy /usr/local/bin/
+          trivy --version  # Check Trivy version
+
+      - name: Download Go dependencies
+        run: go mod download
+
+      - name: Run Trivy Scan
+        run: |
+          trivy filesystem --exit-code 1 --severity HIGH --no-progress ./go.sum
